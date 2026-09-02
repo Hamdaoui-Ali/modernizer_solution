@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { getAzureSmokeCopy, getRouteValidationMessage, getStartReadinessCopy } from "../app/migrations/new/NewMigrationForm";
+import {
+  EMPTY_FIELDS,
+  getAzureSmokeCopy,
+  getRouteValidationMessage,
+  getStartReadinessCopy,
+} from "../app/migrations/new/NewMigrationForm";
 import { DEFAULT_V2_STAGE_CONTINUATION_POLICY, createV2JobPayload } from "../lib/controlTowerApi";
 import {
   MIGRATION_PROFILE_OPTIONS,
@@ -685,19 +690,23 @@ describe("F3/F4 Profile selectors and route preview", () => {
     expect(MIGRATION_PROFILE_OPTIONS.find((p) => p.id === "springboot-2.7-java11")?.selectableAsTarget).toBe(true);
   });
 
-  it("defaults are springboot-2.1-java11 source and springboot-4.0-java21 target", () => {
-    const defaults = {
-      sourceProfile: "springboot-2.1-java11" as MigrationProfileId,
-      targetProfile: "springboot-4.0-java21" as MigrationProfileId,
-    };
-    const sourceOption = MIGRATION_PROFILE_OPTIONS.find((p) => p.id === defaults.sourceProfile);
-    const targetOption = MIGRATION_PROFILE_OPTIONS.find((p) => p.id === defaults.targetProfile);
-    expect(sourceOption).toBeDefined();
-    expect(sourceOption!.selectableAsSource).toBe(true);
-    expect(sourceOption!.selectableAsTarget).toBe(false);
-    expect(targetOption).toBeDefined();
-    expect(targetOption!.selectableAsSource).toBe(false);
-    expect(targetOption!.selectableAsTarget).toBe(true);
+  it("starts the active Boot 2.7 to Boot 3.5 Java 17 route in its job payload", () => {
+    const payload = createV2JobPayload(
+      "setup-1",
+      DEFAULT_V2_STAGE_CONTINUATION_POLICY,
+      {
+        sourceProfile: EMPTY_FIELDS.sourceProfile,
+        targetProfile: EMPTY_FIELDS.targetProfile,
+      },
+    );
+
+    expect(payload.source_profile).toBe("springboot-2.7-java11");
+    expect(payload.target_profile).toBe("springboot-3.5-java17");
+    expect(getRoutePreview(EMPTY_FIELDS.sourceProfile, EMPTY_FIELDS.targetProfile)).toEqual({
+      included: ["2"],
+      skipped: ["1"],
+      excluded: ["3", "4"],
+    });
   });
 
   it("includes springboot-3.5-java21 as a selectable intermediate profile", () => {
