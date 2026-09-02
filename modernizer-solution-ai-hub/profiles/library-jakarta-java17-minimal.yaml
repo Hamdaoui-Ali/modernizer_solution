@@ -1,0 +1,58 @@
+id: library-jakarta-java17-minimal
+schema: schemas/migration-profile.schema.json
+description: Minimal experimental read-only profile for shared Maven JAR libraries targeting Java 17 build configuration and selected javax to jakarta migrations.
+strategy: read_only_library_jakarta_java17_first
+risk_level: experimental
+production_allowed: false
+source:
+  java:
+    allowed_versions:
+      - "11"
+  spring_boot:
+    allowed_version_prefixes:
+      - unknown
+      - "2.1"
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "17"
+  spring_boot: "3.5.14"
+  spring_framework: "6.2.18"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: false
+  dry_run_only: true
+  original_source_modification_allowed: false
+openrewrite:
+  preview_allowed: true
+  apply_allowed: false
+  plugin:
+    group_id: org.openrewrite.maven
+    artifact_id: rewrite-maven-plugin
+    version: "6.40.0"
+  recipe_artifacts:
+    - org.openrewrite.recipe:rewrite-migrate-java:3.35.0
+  active_recipes:
+    - org.openrewrite.java.migrate.UpgradeBuildToJava17
+    - org.openrewrite.java.migrate.jakarta.JavaxAnnotationMigrationToJakartaAnnotation
+    - org.openrewrite.java.migrate.jakarta.JavaxXmlBindMigrationToJakartaXmlBind
+    - org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence
+    - org.openrewrite.java.migrate.jakarta.JavaxServletToJakartaServlet
+  catalog_path: catalogs/openrewrite/library-jakarta-java17-minimal.yaml
+  license_note: "Preview-only. rewrite-migrate-java recipe artifact may be Moderne Source Available License; legal review required before production use."
+manual_review_rules:
+  - Flag any generated patch that changes jakarta.servlet-api scope from provided to compile.
+  - Confirm this first pass does not introduce Spring Boot upgrade, broad JakartaEE10 composite, or Java source modernization changes.
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml

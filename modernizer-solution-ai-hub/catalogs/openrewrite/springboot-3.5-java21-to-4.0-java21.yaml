@@ -1,0 +1,24 @@
+id: springboot-3.5-java21-to-4.0-java21
+kind: openrewrite-catalog
+verification_status: sandbox
+plugin:
+  group_id: org.openrewrite.maven
+  artifact_id: rewrite-maven-plugin
+  version: "6.40.0"
+recipe_artifacts:
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-spring
+    version: "6.31.0"
+active_recipes:
+  - org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0
+preview_goals:
+  - dryRun
+  - dryRunNoFork
+defaults:
+  export_datatables: true
+  fail_on_dry_run_results: false
+apply_goal: runNoFork
+rewrite_run_allowed: true
+code_modification_allowed: true
+notes:
+  - Apply Spring Boot 4 upgrade recipes in a sandbox only after the Boot 3.5 / Java 21 stage is green.

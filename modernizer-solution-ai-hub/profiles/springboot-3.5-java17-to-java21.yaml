@@ -1,0 +1,48 @@
+id: springboot-3.5-java17-to-java21
+schema: schemas/migration-profile.schema.json
+description: Optional Java 21 runtime validation for Spring Boot 3.5.x applications that are already green on Java 17.
+stage: C
+stage_name: springboot-3.5-java17-to-java21
+stage_order: 3
+purpose: Apply Java 21 upgrade recipes in a sandbox after the Java 17 + Spring Boot 3.5 migration is already green.
+strategy: java21_runtime_validation_only
+risk_level: medium
+production_allowed: false
+sandbox_transform_allowed: true
+source_jdk_home_env: JAVA17_HOME
+target_jdk_home_env: JAVA21_HOME
+source:
+  java:
+    allowed_versions:
+      - "17"
+  spring_boot:
+    allowed_version_prefixes:
+      - "3.5"
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "21"
+  spring_boot: "3.5.6"
+  spring_framework: "6.2.18"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: true
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: true
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: true
+openrewrite:
+  preview_allowed: true
+  apply_allowed: true
+  catalog_path: catalogs/openrewrite/springboot-3.5-java17-to-java21.yaml
+  apply_goal: runNoFork
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml
+

@@ -1,0 +1,3 @@
+# Convenience install for local development and test execution.
+# The editable project install remains the primary source of truth.
+-e .[test]

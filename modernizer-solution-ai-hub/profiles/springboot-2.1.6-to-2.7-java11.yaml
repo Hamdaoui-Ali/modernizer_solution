@@ -1,0 +1,47 @@
+id: springboot-2.1.6-to-2.7-java11
+schema: schemas/migration-profile.schema.json
+description: Stage A migration from Spring Boot 2.1.6.RELEASE on Java 11 to Spring Boot 2.7.18 while staying on Java 11.
+stage: A
+stage_name: springboot-2.1.6-to-2.7-java11
+stage_order: 1
+purpose: Bring old Spring Boot 2.1.x applications to latest Spring Boot 2.7.x before Jakarta and Java 17 work.
+strategy: staged_openrewrite_sandbox
+risk_level: high
+production_allowed: false
+sandbox_transform_allowed: true
+source:
+  java:
+    allowed_versions:
+      - "11"
+  spring_boot:
+    allowed_version_prefixes:
+      - "2.1"
+      - "2.1.6"
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "11"
+  spring_boot: "2.7.18"
+  spring_framework: "5.3.x"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: true
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: true
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: true
+openrewrite:
+  preview_allowed: true
+  apply_allowed: true
+  catalog_path: catalogs/openrewrite/springboot-2.1.6-to-2.7-java11.yaml
+  apply_goal: runNoFork
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml
+

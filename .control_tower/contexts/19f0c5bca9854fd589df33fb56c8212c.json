@@ -1,0 +1,22 @@
+{
+  "build_timeout_seconds": null,
+  "command_id": "19f0c5bca9854fd589df33fb56c8212c",
+  "job_id": "caa7b973d547439b92e9469bc8b68c39",
+  "require_test_reports": false,
+  "route_step_index": 4,
+  "run_dir": "C:\\Users\\abdelilah.mortaki\\Desktop\\modernized-v2-runs\\.migration\\runs\\v2-caa7b973-s4",
+  "runtime_profile": "springboot-3.5-java21-to-4.0-java21",
+  "sandbox_path": "C:\\Users\\abdelilah.mortaki\\Desktop\\modernized-v2-runs\\.migration\\runs\\v2-caa7b973-s4\\workspaces\\sandbox",
+  "source_changing_unit": false,
+  "source_jdk_home_env": "JAVA21_HOME",
+  "stage_index": 4,
+  "stop_after_start": true,
+  "target_jdk_home_env": "JAVA21_HOME",
+  "validation_command": [
+    "C:\\Tools\\apache-maven-3.9.15\\bin\\mvn.cmd",
+    "clean",
+    "test"
+  ],
+  "validation_unit_id": "existing-test-migration",
+  "working_directory": "C:\\Users\\abdelilah.mortaki\\Desktop\\modernized-v2-runs\\.migration\\runs\\v2-caa7b973-s4\\workspaces\\sandbox"
+}

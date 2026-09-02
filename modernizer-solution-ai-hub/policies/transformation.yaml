@@ -1,0 +1,23 @@
+id: transformation
+agent: transformer
+source_writes_allowed: true
+source_writes_condition: after_human_approval_only
+openrewrite:
+  preview_allowed: true
+  apply_allowed: false
+  allowed_preview_goals:
+    - dryRun
+    - dryRunNoFork
+    - discover
+  forbidden_apply_goals:
+    - run
+    - runNoFork
+    - rewrite:run
+    - rewrite:runNoFork
+approval:
+  options:
+    - approve
+    - approve_with_changes
+    - reject
+    - replan
+

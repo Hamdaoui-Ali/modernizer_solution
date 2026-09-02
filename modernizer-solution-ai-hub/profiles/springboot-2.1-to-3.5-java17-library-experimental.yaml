@@ -1,0 +1,51 @@
+id: springboot-2.1-to-3.5-java17-library-experimental
+schema: schemas/migration-profile.schema.json
+description: Experimental read-only profile for shared Maven JAR libraries from Spring Boot 2.1-era Java 11 to Spring Boot 3.5.14 Java 17.
+strategy: read_only_library_assessment_first
+risk_level: experimental
+production_allowed: false
+source:
+  java:
+    allowed_versions:
+      - "11"
+  spring_boot:
+    allowed_version_prefixes:
+      - "2.1"
+      - unknown
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "17"
+  spring_boot: "3.5.14"
+  spring_framework: "6.2.18"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: false
+openrewrite:
+  preview_allowed: true
+  apply_allowed: false
+  plugin:
+    group_id: org.openrewrite.maven
+    artifact_id: rewrite-maven-plugin
+    version: "6.40.0"
+  recipe_artifacts:
+    - org.openrewrite.recipe:rewrite-spring:6.31.0
+    - org.openrewrite.recipe:rewrite-migrate-java:3.35.0
+  active_recipes:
+    - org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5
+    - org.openrewrite.java.migrate.jakarta.JakartaEE10
+  catalog_path: catalogs/openrewrite/springboot-3.5-java17-library-experimental.yaml
+  license_note: "Preview-only. rewrite-spring and rewrite-migrate-java latest recipe artifacts may be Moderne Source Available License; legal review required before production use."
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml

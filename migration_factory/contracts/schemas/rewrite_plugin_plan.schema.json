@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "rewrite_plugin_plan",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "profile_id",
+    "catalog_path",
+    "catalog_id",
+    "plugin",
+    "recipe_artifacts",
+    "active_recipes",
+    "preview_goals",
+    "selected_preview_goal",
+    "apply_goals_forbidden",
+    "artifact_refs"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "run_id": {"type": "string"},
+    "status": {"type": "string", "enum": ["USED", "SKIPPED", "FAILED"]},
+    "profile_id": {"type": ["string", "null"]},
+    "catalog_path": {"type": ["string", "null"]},
+    "catalog_id": {"type": ["string", "null"]},
+    "plugin": {"type": ["string", "null"]},
+    "recipe_artifacts": {
+      "oneOf": [
+        {"type": "array", "items": {"type": "string"}},
+        {"type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "active_recipes": {
+      "oneOf": [
+        {"type": "array", "items": {"type": "string"}},
+        {"type": "string"},
+        {"type": "null"}
+      ]
+    },
+    "preview_goals": {"type": "array", "items": {"type": "string"}},
+    "selected_preview_goal": {"type": ["string", "null"], "enum": ["rewrite:dryRun", "dryRun", null]},
+    "apply_goals_forbidden": {"type": "boolean", "const": true},
+    "artifact_refs": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    }
+  },
+  "additionalProperties": true
+}

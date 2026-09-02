@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "rewrite_impact_summary",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "agent",
+    "phase",
+    "status",
+    "overall_impact",
+    "changed_files",
+    "high_risk_files",
+    "migration_signals",
+    "blocked_reasons",
+    "source_modified",
+    "artifact_refs"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "agent": {"type": "string", "minLength": 1},
+    "phase": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["PASS", "FAIL", "WARNING", "SKIPPED"]},
+    "overall_impact": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "BLOCKED", "UNKNOWN"]
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "high_risk_files": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "migration_signals": {
+      "type": "object",
+      "properties": {
+        "api_or_boot_upgrade": {"type": "boolean"},
+        "javax_removed": {"type": "boolean"},
+        "boot_2_to_3_gap": {"type": "boolean"},
+        "boot_2_to_4_gap": {"type": "boolean"},
+        "boot4_target": {"type": "boolean"},
+        "java_11_to_17_gap": {"type": "boolean"},
+        "java_8_to_21_gap": {"type": "boolean"},
+        "java_21_target": {"type": "boolean"},
+        "javax_present": {"type": "boolean"},
+        "security_config_touched": {"type": "boolean"},
+        "datasource_config_touched": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "blocked_reasons": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "source_modified": {"type": "boolean"},
+    "artifact_refs": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    }
+  },
+  "additionalProperties": true
+}

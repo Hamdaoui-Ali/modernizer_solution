@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["schema_version", "run_id", "h2_status", "required", "proof_level", "command", "cwd", "config_path", "startup_observed", "limitations"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string"},
+    "h2_status": {"enum": ["H2_STARTUP_SKIPPED", "H2_STARTUP_PASSED", "H2_STARTUP_FAILED", "H2_STARTUP_WARNING"]},
+    "required": {"type": "boolean"},
+    "proof_level": {"enum": ["not_verified", "compiled", "unit_tests_passed", "h2_runtime_started"]},
+    "command": {"type": "array", "items": {"type": "string"}},
+    "cwd": {"type": "string"},
+    "java_version": {"type": "string"},
+    "maven_command": {"type": "string"},
+    "config_path": {"type": "string"},
+    "startup_observed": {"type": "boolean"},
+    "failure_patterns": {"type": "array"},
+    "security_env_warnings": {"type": "array"},
+    "stdout_tail": {"type": "string"},
+    "stderr_tail": {"type": "string"},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,51 @@
+id: springboot-2.7-to-3.5-java17
+schema: schemas/migration-profile.schema.json
+description: Spring Boot 2.7 on Java 8 or 11 to Spring Boot 3.5.6 on Java 17.
+stage: B
+stage_name: springboot-2.7-to-3.5-java17
+stage_order: 2
+purpose: Existing mature Spring Boot 2.7 to Spring Boot 3.5.x migration on Java 17.
+production_allowed: false
+sandbox_transform_allowed: true
+source:
+  java:
+    allowed_versions:
+      - "8"
+      - "11"
+  spring_boot:
+    allowed_version_prefixes:
+      - "2.7"
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "17"
+  spring_boot: "3.5.6"
+  spring_framework: "6.2.18"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: true
+openrewrite:
+  preview_allowed: true
+  apply_allowed: true
+  catalog_path: catalogs/openrewrite/springboot-3.5-java17.yaml
+  apply_goal: runNoFork
+  post_apply_patches:
+    - type: spring_boot_version
+      old_value: 3.5.14
+      new_value: 3.5.6
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml
+
+
+

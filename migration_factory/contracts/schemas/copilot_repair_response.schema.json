@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "repair_summary",
+    "failure_classification",
+    "skills_claimed",
+    "wrapper_checklist",
+    "patch_proposals",
+    "security_review_required",
+    "confidence",
+    "refusals",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "repair_summary": {"type": "string"},
+    "failure_classification": {"type": "string"},
+    "skills_claimed": {"type": "array", "items": {"type": "string"}},
+    "wrapper_checklist": {
+      "type": "object",
+      "required": [
+        "legacy_source_not_modified",
+        "sandbox_only",
+        "no_deployment",
+        "no_pr_creation",
+        "no_security_weakening",
+        "h2_only_runtime_scope",
+        "sql_server_out_of_scope",
+        "endpoint_smoke_out_of_scope"
+      ],
+      "properties": {
+        "legacy_source_not_modified": {"const": true},
+        "sandbox_only": {"const": true},
+        "no_deployment": {"const": true},
+        "no_pr_creation": {"const": true},
+        "no_security_weakening": {"const": true},
+        "h2_only_runtime_scope": {"const": true},
+        "sql_server_out_of_scope": {"const": true},
+        "endpoint_smoke_out_of_scope": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "patch_proposals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "proposal_id",
+          "deterministic_rule_id",
+          "risk",
+          "requires_human_review",
+          "description",
+          "unified_diff",
+          "expected_validation"
+        ],
+        "properties": {
+          "proposal_id": {"type": "string"},
+          "deterministic_rule_id": {"type": "string"},
+          "risk": {"enum": ["LOW", "MEDIUM", "HIGH", "BLOCKED"]},
+          "requires_human_review": {"type": "boolean"},
+          "description": {"type": "string"},
+          "unified_diff": {"type": "string"},
+          "expected_validation": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "security_review_required": {"type": "boolean"},
+    "confidence": {"enum": ["LOW", "MEDIUM", "HIGH"]},
+    "refusals": {"type": "array", "items": {"type": "string"}},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

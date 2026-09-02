@@ -1,0 +1,392 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1900 1180"
+  role="img"
+  aria-labelledby="title desc"
+>
+  <title id="title">AI Migration Factory Current POC Workflow</title>
+  <desc id="desc">
+    Current AI Migration Factory POC workflow for Java and Spring Boot migration.
+    The orchestrator handles the backend flow end to end: preflight, analysis, planning, assessment,
+    human approval, sandbox migration, build and test validation, summaries and final reporting.
+    TUI only launches and watches. Copilot is advisory only.
+  </desc>
+
+  <defs>
+    <marker id="arrowBlue" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#2563eb"/>
+    </marker>
+
+    <marker id="arrowGreen" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#059669"/>
+    </marker>
+
+    <marker id="arrowOrange" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#ea580c"/>
+    </marker>
+
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.16"/>
+    </filter>
+
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+
+    <linearGradient id="purple" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+
+    <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+
+    <style>
+      .page { fill: #f8fafc; }
+      .header-title {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 46px;
+        font-weight: 900;
+        fill: #0f172a;
+      }
+      .header-subtitle {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 20px;
+        fill: #334155;
+      }
+      .main-board {
+        fill: #ffffff;
+        stroke: #cbd5e1;
+        stroke-width: 2;
+      }
+      .lane {
+        fill: #f8fafc;
+        stroke: #dbeafe;
+        stroke-width: 2;
+      }
+      .lane-title {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 19px;
+        font-weight: 900;
+        fill: #1e3a8a;
+        letter-spacing: 0.8px;
+      }
+      .node { filter: url(#shadow); }
+      .node-blue { fill: url(#blue); }
+      .node-green { fill: url(#green); }
+      .node-purple { fill: url(#purple); }
+      .node-dark { fill: #1e293b; }
+      .node-white {
+        fill: #ffffff;
+        stroke: #2563eb;
+        stroke-width: 2;
+      }
+      .node-stop {
+        fill: #fff7ed;
+        stroke: #ea580c;
+        stroke-width: 2;
+      }
+      .node-title {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 19px;
+        font-weight: 900;
+        fill: #ffffff;
+      }
+      .node-title-dark {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 19px;
+        font-weight: 900;
+        fill: #0f172a;
+      }
+      .node-text {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 15px;
+        fill: #e0f2fe;
+      }
+      .node-text-dark {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 15px;
+        fill: #334155;
+      }
+      .small-text {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 13px;
+        fill: #475569;
+      }
+      .gate-title {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 19px;
+        font-weight: 900;
+        fill: #111827;
+      }
+      .gate-text {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        fill: #7c2d12;
+      }
+      .arrow {
+        fill: none;
+        stroke: #2563eb;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        marker-end: url(#arrowBlue);
+      }
+      .arrow-green {
+        fill: none;
+        stroke: #059669;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        marker-end: url(#arrowGreen);
+      }
+      .arrow-orange {
+        fill: none;
+        stroke: #ea580c;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 10 8;
+        marker-end: url(#arrowOrange);
+      }
+      .label {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 800;
+        fill: #475569;
+      }
+      .footer { fill: #0f172a; }
+      .footer-title {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 17px;
+        font-weight: 900;
+        fill: #ffffff;
+      }
+      .footer-text {
+        font-family: Inter, Segoe UI, Arial, sans-serif;
+        font-size: 15px;
+        fill: #cbd5e1;
+      }
+    </style>
+  </defs>
+
+  <rect class="page" width="1900" height="1180"/>
+
+  <!-- Header -->
+  <text class="header-title" x="80" y="78">AI Migration Factory — Current POC</text>
+  <text class="header-subtitle" x="82" y="112">
+    Java / Spring Boot migration POC: orchestrator handles all backend phases; TUI only launches and watches.
+  </text>
+
+  <!-- Current POC rule -->
+  <g transform="translate(1160 34)">
+    <rect x="0" y="0" width="650" height="104" rx="16" fill="#eff6ff" stroke="#93c5fd" stroke-width="2"/>
+    <text class="node-title-dark" x="24" y="32">Current POC rule</text>
+    <text class="small-text" x="24" y="56">Orchestrator handles all backend logic: preflight, analysis, planning, approval, transform, build/test, reports.</text>
+    <text class="small-text" x="24" y="77">TUI is wrapper/operator console. Backend artifacts are source of truth.</text>
+    <text class="small-text" x="24" y="96">Copilot is advisory only. No production promotion, PR, deploy, or merge.</text>
+  </g>
+
+  <!-- Main board -->
+  <rect class="main-board" x="60" y="150" width="1780" height="930" rx="28"/>
+
+  <!-- Lanes -->
+  <g id="lanes">
+    <rect class="lane" x="90" y="185" width="1720" height="165" rx="20"/>
+    <text class="lane-title" x="120" y="220">1. OPERATOR / TUI — launches backend and watches artifacts</text>
+
+    <rect class="lane" x="90" y="385" width="1720" height="180" rx="20"/>
+    <text class="lane-title" x="120" y="420">2. ORCHESTRATOR — handles read-only control flow until human approval</text>
+
+    <rect class="lane" x="90" y="600" width="1720" height="195" rx="20"/>
+    <text class="lane-title" x="120" y="635">3. ORCHESTRATOR — handles approved sandbox migration and validation</text>
+
+    <rect class="lane" x="90" y="830" width="1720" height="175" rx="20"/>
+    <text class="lane-title" x="120" y="865">4. ORCHESTRATOR — writes final summaries, reports and optional sidecars</text>
+  </g>
+
+  <!-- Row 1: Operator / TUI -->
+  <g id="row1">
+    <g class="node" transform="translate(170 235)">
+      <rect class="node-blue" width="285" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">1. Setup</text>
+      <text class="node-text" x="24" y="56">profile, paths, mode, run id</text>
+      <text class="node-text" x="24" y="76">Java/Spring target selected</text>
+    </g>
+
+    <g class="node" transform="translate(570 235)">
+      <rect class="node-blue" width="285" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">2. Launch Orchestrator</text>
+      <text class="node-text" x="24" y="56">orchestrator.runner starts</text>
+      <text class="node-text" x="24" y="76">run directory created</text>
+    </g>
+
+    <g class="node" transform="translate(970 235)">
+      <rect class="node-blue" width="285" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">3. TUI Watches</text>
+      <text class="node-text" x="24" y="56">polls run artifacts</text>
+      <text class="node-text" x="24" y="76">does not own gates</text>
+    </g>
+
+    <g class="node" transform="translate(1370 235)">
+      <rect class="node-blue" width="285" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">4. Dashboard Status</text>
+      <text class="node-text" x="24" y="56">phase state visible</text>
+      <text class="node-text" x="24" y="76">details show raw artifacts</text>
+    </g>
+  </g>
+
+  <path class="arrow" d="M455 279 L560 279"/>
+  <path class="arrow" d="M855 279 L960 279"/>
+  <path class="arrow" d="M1255 279 L1360 279"/>
+
+  <!-- Row 1 to row 2 -->
+  <path class="arrow" d="M712 323 C712 360 300 360 300 455"/>
+
+  <!-- Row 2: Orchestrator read-only control -->
+  <g id="row2">
+    <g class="node" transform="translate(170 450)">
+      <rect class="node-white" width="260" height="88" rx="18"/>
+      <text class="node-title-dark" x="24" y="32">5. Preflight</text>
+      <text class="node-text-dark" x="24" y="56">orchestrator validates</text>
+      <text class="node-text-dark" x="24" y="76">paths + profile</text>
+    </g>
+
+    <g class="node" transform="translate(500 450)">
+      <rect class="node-white" width="260" height="88" rx="18"/>
+      <text class="node-title-dark" x="24" y="32">6. Analysis</text>
+      <text class="node-text-dark" x="24" y="56">orchestrator calls agent</text>
+      <text class="node-text-dark" x="24" y="76">detect Java/Spring/deps</text>
+    </g>
+
+    <g class="node" transform="translate(830 450)">
+      <rect class="node-white" width="260" height="88" rx="18"/>
+      <text class="node-title-dark" x="24" y="32">7. Planning</text>
+      <text class="node-text-dark" x="24" y="56">orchestrator builds plan</text>
+      <text class="node-text-dark" x="24" y="76">approval request</text>
+    </g>
+
+    <g class="node" transform="translate(1160 450)">
+      <rect class="node-white" width="260" height="88" rx="18"/>
+      <text class="node-title-dark" x="24" y="32">8. Assessment</text>
+      <text class="node-text-dark" x="24" y="56">orchestrator checks risk</text>
+      <text class="node-text-dark" x="24" y="76">no execution claims</text>
+    </g>
+
+    <g class="node" transform="translate(1510 420)">
+      <polygon points="130,0 260,74 130,148 0,74" fill="url(#orange)"/>
+      <text class="gate-title" x="78" y="60">9. Human</text>
+      <text class="gate-title" x="70" y="84">Approval</text>
+      <text class="gate-text" x="72" y="112">APPROVE / STOP</text>
+    </g>
+  </g>
+
+  <path class="arrow" d="M430 494 L490 494"/>
+  <path class="arrow" d="M760 494 L820 494"/>
+  <path class="arrow" d="M1090 494 L1150 494"/>
+  <path class="arrow" d="M1420 494 L1500 494"/>
+
+  <!-- Stop branch -->
+  <g class="node" transform="translate(1510 570)">
+    <rect class="node-stop" width="260" height="70" rx="16"/>
+    <text class="node-title-dark" x="24" y="30">Stop before transform</text>
+    <text class="node-text-dark" x="24" y="54">rejected / replan / blockers</text>
+  </g>
+  <path class="arrow-orange" d="M1640 568 L1640 650"/>
+  <text class="label" x="1660" y="610">not approved</text>
+
+  <!-- Row 2 to row 3 -->
+  <path class="arrow-green" d="M1640 568 C1640 595 300 590 300 665"/>
+  <text class="label" x="1425" y="590">approved</text>
+
+  <!-- Row 3: Orchestrator approved sandbox migration -->
+  <g id="row3">
+    <g class="node" transform="translate(170 665)">
+      <rect class="node-green" width="275" height="94" rx="18"/>
+      <text class="node-title" x="24" y="34">10. Approve + Lock</text>
+      <text class="node-text" x="24" y="60">orchestrator writes</text>
+      <text class="node-text" x="24" y="80">approval + plan lock</text>
+    </g>
+
+    <g class="node" transform="translate(545 665)">
+      <rect class="node-green" width="275" height="94" rx="18"/>
+      <text class="node-title" x="24" y="34">11. Sandbox Copy</text>
+      <text class="node-text" x="24" y="60">orchestrator prepares</text>
+      <text class="node-text" x="24" y="80">legacy app untouched</text>
+    </g>
+
+    <g class="node" transform="translate(920 665)">
+      <rect class="node-green" width="300" height="94" rx="18"/>
+      <text class="node-title" x="24" y="34">12. Transform</text>
+      <text class="node-text" x="24" y="60">orchestrator runs service</text>
+      <text class="node-text" x="24" y="80">OpenRewrite + patches</text>
+    </g>
+
+    <g class="node" transform="translate(1320 665)">
+      <rect class="node-green" width="310" height="94" rx="18"/>
+      <text class="node-title" x="24" y="34">13. Build + Test</text>
+      <text class="node-text" x="24" y="60">orchestrator validates</text>
+      <text class="node-text" x="24" y="80">mvn clean test in sandbox</text>
+    </g>
+  </g>
+
+  <path class="arrow-green" d="M445 712 L535 712"/>
+  <path class="arrow-green" d="M820 712 L910 712"/>
+  <path class="arrow-green" d="M1220 712 L1310 712"/>
+
+  <!-- Row 3 to row 4 -->
+  <path class="arrow" d="M1475 759 C1475 805 300 800 300 895"/>
+
+  <!-- Row 4: Reporting -->
+  <g id="row4">
+    <g class="node" transform="translate(170 895)">
+      <rect class="node-purple" width="300" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">14. Summary</text>
+      <text class="node-text" x="24" y="56">orchestrator writes</text>
+      <text class="node-text" x="24" y="76">status + artifact refs</text>
+    </g>
+
+    <g class="node" transform="translate(570 895)">
+      <rect class="node-purple" width="300" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">15. Final Report</text>
+      <text class="node-text" x="24" y="56">migration_report.json</text>
+      <text class="node-text" x="24" y="76">migration_summary.md</text>
+    </g>
+
+    <g class="node" transform="translate(970 895)">
+      <rect class="node-purple" width="300" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">16. Optional Copilot Docs</text>
+      <text class="node-text" x="24" y="56">orchestrator triggers sidecar</text>
+      <text class="node-text" x="24" y="76">advisory report only</text>
+    </g>
+
+    <g class="node" transform="translate(1370 895)">
+      <rect class="node-dark" width="300" height="88" rx="18"/>
+      <text class="node-title" x="24" y="32">17. POC Stop Point</text>
+      <text class="node-text" x="24" y="56">sandbox candidate ready</text>
+      <text class="node-text" x="24" y="76">no PR / deploy / merge</text>
+    </g>
+  </g>
+
+  <path class="arrow" d="M470 939 L560 939"/>
+  <path class="arrow-orange" d="M870 939 L960 939"/>
+  <path class="arrow" d="M1270 939 L1360 939"/>
+
+  <!-- Footer -->
+  <g id="footer">
+    <rect class="footer" x="90" y="1100" width="1720" height="58" rx="18"/>
+    <text class="footer-title" x="120" y="1124">Current POC truth</text>
+    <text class="footer-text" x="120" y="1148">
+      Orchestrator handles all backend phases • TUI only controls UX • Java/Spring only now • Sandbox only • Build/test after transform • Human approval required
+    </text>
+  </g>
+</svg>

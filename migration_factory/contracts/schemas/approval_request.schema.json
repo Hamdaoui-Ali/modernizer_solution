@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "approval_request",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "agent",
+    "phase",
+    "status",
+    "profile",
+    "requires_human_approval",
+    "decision_options",
+    "recommended_decision",
+    "units_to_execute",
+    "blockers",
+    "warnings",
+    "artifact_refs"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "agent": {"type": "string", "enum": ["planning_agent"]},
+    "phase": {"type": "string", "enum": ["approval"]},
+    "status": {"type": "string", "enum": ["PASS", "FAIL", "WARNING", "SKIPPED"]},
+    "profile": {"type": "string", "minLength": 1},
+    "requires_human_approval": {"type": "boolean", "const": true},
+    "decision": {
+      "type": "string",
+      "enum": ["approved", "rejected", "replan_required"]
+    },
+    "decision_options": {
+      "type": "array",
+      "enum": [["approved", "rejected", "replan_required"]]
+    },
+    "recommended_decision": {"type": "null"},
+    "units_to_execute": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "blockers": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "warnings": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "artifact_refs": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    }
+  },
+  "additionalProperties": true
+}

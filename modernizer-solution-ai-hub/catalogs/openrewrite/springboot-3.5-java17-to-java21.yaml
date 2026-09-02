@@ -1,0 +1,26 @@
+id: springboot-3.5-java17-to-java21
+kind: openrewrite-catalog
+verification_status: sandbox
+plugin:
+  group_id: org.openrewrite.maven
+  artifact_id: rewrite-maven-plugin
+  version: "6.40.0"
+recipe_artifacts:
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-migrate-java
+    version: "3.35.0"
+active_recipes:
+  - org.openrewrite.java.migrate.UpgradeToJava21
+preview_goals:
+  - dryRun
+  - dryRunNoFork
+defaults:
+  export_datatables: true
+  fail_on_dry_run_results: false
+apply_goal: runNoFork
+rewrite_run_allowed: true
+code_modification_allowed: true
+notes:
+  - Apply Java 21 upgrade recipes in a sandbox only after the Boot 3.5 / Java 17 stage is green.
+  - Do not target Spring Boot 4 from this profile.
+

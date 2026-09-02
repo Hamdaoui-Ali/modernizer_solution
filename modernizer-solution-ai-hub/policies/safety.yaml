@@ -1,0 +1,14 @@
+id: safety
+approval_options:
+  - approve
+  - approve_with_changes
+  - reject
+  - replan
+source_write_rules:
+  analysis_agent: none
+  planning_agent: none
+  transformer_agent: after_human_approval_only
+generated_hub_rules:
+  migration_ai_hub_is_source_of_truth: false
+  external_ai_hub_is_source_of_truth: true
+

@@ -1,0 +1,12 @@
+# Ne JAMAIS pousser le code source du client
+legacy-app/
+modernized-app/
+
+# Ne JAMAIS pousser les rapports générés de test locaux
+*.json
+*.patch
+.migration/
+
+# Fichiers techniques Python
+__pycache__/
+*.pyc

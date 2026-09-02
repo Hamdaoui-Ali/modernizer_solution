@@ -1,0 +1,37 @@
+id: springboot-3.5-java17
+kind: openrewrite-catalog
+verification_status: verified
+verified_on: "2026-05-15"
+verification_sources:
+  - https://repo.maven.apache.org/maven2/org/openrewrite/maven/rewrite-maven-plugin/maven-metadata.xml
+  - https://repo.maven.apache.org/maven2/org/openrewrite/recipe/rewrite-spring/maven-metadata.xml
+  - https://repo.maven.apache.org/maven2/org/openrewrite/recipe/rewrite-migrate-java/maven-metadata.xml
+  - https://docs.openrewrite.org/recipes/java/spring/boot3/upgradespringboot_3_5-community-edition
+  - https://docs.openrewrite.org/recipes/java/migrate/upgradetojava17
+plugin:
+  group_id: org.openrewrite.maven
+  artifact_id: rewrite-maven-plugin
+  version: "6.39.0"
+recipe_artifacts:
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-spring
+    version: "6.30.4"
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-migrate-java
+    version: "3.34.1"
+active_recipes:
+  - org.openrewrite.java.migrate.UpgradeToJava17
+  - org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5
+  - org.openrewrite.maven.RemoveRedundantDependencyVersions
+preview_goals:
+  - dryRun
+  - dryRunNoFork
+  - discover
+forbidden_apply_goals:
+  - run
+  - runNoFork
+  - rewrite:run
+  - rewrite:runNoFork
+defaults:
+  export_datatables: true
+  fail_on_dry_run_results: false

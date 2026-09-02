@@ -1,0 +1,15 @@
+id: planning
+agent: planning
+source_writes_allowed: false
+approval:
+  required_before_transformation: true
+  options:
+    - approved
+    - rejected
+    - replan_required
+inputs:
+  dependency_graph_unavailable_fatal: false
+  baseline_tests_required: false
+outputs:
+  require_profile_id_match: true
+  require_relative_catalog_paths: true

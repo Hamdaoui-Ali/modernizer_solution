@@ -1,0 +1,163 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "copilot_report_context",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "profile",
+    "statuses",
+    "approval",
+    "migration_units",
+    "openrewrite",
+    "transformation",
+    "build",
+    "tests",
+    "dependency_policy",
+    "security",
+    "scope_limits",
+    "artifact_refs",
+    "provenance",
+    "warnings",
+    "blockers",
+    "errors"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "profile": {
+      "type": "object",
+      "required": ["id", "risk_level", "source_stack", "target_stack"],
+      "properties": {
+        "id": {"type": ["string", "null"]},
+        "risk_level": {"type": ["string", "null"]},
+        "source_stack": {"type": "object"},
+        "target_stack": {"type": "object"}
+      },
+      "additionalProperties": true
+    },
+    "statuses": {
+      "type": "object",
+      "required": ["final", "orchestration", "approval", "transform", "build", "tests"],
+      "additionalProperties": {"type": ["string", "null", "boolean", "number", "object", "array"]}
+    },
+    "approval": {
+      "type": "object",
+      "required": ["status", "decision", "decided_by", "decided_at", "plan_lock_ref", "lock_status"],
+      "additionalProperties": true
+    },
+    "migration_units": {
+      "type": "object",
+      "required": ["count", "units", "source"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 0},
+        "units": {"type": "array", "items": {"type": "object"}},
+        "source": {"type": "string"}
+      },
+      "additionalProperties": true
+    },
+    "openrewrite": {
+      "type": "object",
+      "required": ["status", "unit_id", "plugin", "recipe_artifacts", "active_recipes", "apply_goal", "apply_maven_args"],
+      "additionalProperties": true
+    },
+    "transformation": {
+      "type": "object",
+      "required": ["status", "sandbox_path", "plan_target", "current_unit", "blocked_unit", "next_unit_index"],
+      "additionalProperties": true
+    },
+    "build": {
+      "type": "object",
+      "required": ["status", "command", "validations", "log_ref"],
+      "additionalProperties": true
+    },
+    "tests": {
+      "type": "object",
+      "required": ["status", "totals", "execution_owner", "execution_mode", "report_paths"],
+      "additionalProperties": true
+    },
+    "ai_trace": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "event",
+          "agent",
+          "evidence_refs",
+          "context_pack_checksum",
+          "diagnosis",
+          "proposal_ref",
+          "proposal_checksum",
+          "reviewer_verdict",
+          "human_decision",
+          "validation_result",
+          "ledger_ref"
+        ],
+        "properties": {
+          "event": {"type": "string"},
+          "agent": {"type": "string"},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "context_pack_checksum": {"type": "string"},
+          "diagnosis": {"type": "string"},
+          "proposal_ref": {"type": "string"},
+          "proposal_checksum": {"type": "string"},
+          "reviewer_verdict": {"type": "string"},
+          "human_decision": {"type": "string"},
+          "validation_result": {"type": "string"},
+          "ledger_ref": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "dependency_policy": {
+      "type": "object",
+      "required": [
+        "target_dependency_plan_ref",
+        "report_ref",
+        "status",
+        "risks_count",
+        "blockers_count",
+        "copilot_advisory_status",
+        "policy_patch_applied",
+        "unresolved_v2_dependency_risks"
+      ],
+      "properties": {
+        "target_dependency_plan_ref": {"type": "string"},
+        "report_ref": {"type": "string"},
+        "status": {"type": "string"},
+        "risks_count": {"type": ["integer", "number"], "minimum": 0},
+        "blockers_count": {"type": ["integer", "number"], "minimum": 0},
+        "copilot_advisory_status": {"type": "string"},
+        "policy_patch_applied": {"type": "boolean"},
+        "unresolved_v2_dependency_risks": {"type": "array", "items": {"type": "object"}}
+      },
+      "additionalProperties": true
+    },
+    "security": {
+      "type": "object",
+      "required": ["status", "security_config_touched", "warnings"],
+      "additionalProperties": true
+    },
+    "scope_limits": {"type": "array", "items": {"type": "string"}},
+    "artifact_refs": {
+      "type": "object",
+      "required": ["report_context"],
+      "additionalProperties": {"type": "string", "minLength": 1}
+    },
+    "provenance": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "pattern": "^[^#]+(#/.*)?$"
+        }
+      }
+    },
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,36 @@
+id: springboot-3.5-java17-library-experimental
+kind: openrewrite-catalog
+verification_status: experimental-preview-only
+plugin:
+  group_id: org.openrewrite.maven
+  artifact_id: rewrite-maven-plugin
+  version: "6.40.0"
+recipe_artifacts:
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-spring
+    version: "6.31.0"
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-migrate-java
+    version: "3.35.0"
+active_recipes:
+  - org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_5
+  - org.openrewrite.java.migrate.jakarta.JakartaEE10
+preview_goals:
+  - dryRun
+forbidden_apply_goals:
+  - run
+  - runNoFork
+  - rewrite:run
+  - rewrite:runNoFork
+defaults:
+  export_datatables: true
+  fail_on_dry_run_results: false
+dry_run_only: true
+rewrite_run_allowed: false
+code_modification_allowed: false
+notes:
+  - Shared Maven JAR library assessment only; not a runnable Spring Boot service migration profile.
+  - First real execution must use read_only_assessment mode.
+  - No rewrite:run, no OpenRewrite apply, and no code modification are allowed by this catalog.
+  - Preview-only. rewrite-spring and rewrite-migrate-java latest recipe artifacts may be Moderne Source Available License; legal review required before production use.
+license_note: "Preview-only. rewrite-spring and rewrite-migrate-java latest recipe artifacts may be Moderne Source Available License; legal review required before production use."

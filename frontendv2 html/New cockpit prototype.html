@@ -1,0 +1,3309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Migration Cockpit V3.3 · Migration Factory</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --surface-muted: #f0f3f7;
+      --surface-raised: rgba(255, 255, 255, .86);
+
+      --text: #172033;
+      --text-strong: #0b0e14;
+      --muted: #667085;
+      --muted-2: #8b94a3;
+
+      --border: #dce2e9;
+      --border-strong: #c7d0db;
+
+      --blue: #4c8dff;
+      --blue-deep: #3157d5;
+      --blue-soft: #edf4ff;
+
+      --green: #35d07f;
+      --green-text: #137847;
+      --green-soft: #eaf9f1;
+
+      --amber: #f5a623;
+      --amber-text: #956100;
+      --amber-soft: #fff6e3;
+
+      --red: #ff5c5c;
+      --red-text: #b42318;
+      --red-soft: #fff0f0;
+
+      --graphite: #0b0e14;
+      --graphite-2: #12161f;
+      --graphite-3: #171d28;
+      --graphite-border: #2a3445;
+      --graphite-text: #e4e7ec;
+      --graphite-muted: #8b94a3;
+
+      --radius: 14px;
+      --radius-sm: 9px;
+      --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 14px 38px rgba(16, 24, 40, .065);
+      --shadow-deep: 0 24px 70px rgba(16, 24, 40, .18);
+      --focus: 0 0 0 3px rgba(76, 141, 255, .18);
+
+      --motion-fast: 140ms;
+      --motion-base: 200ms;
+      --motion-slow: 260ms;
+      --ease-standard: cubic-bezier(.2, 0, 0, 1);
+      --ease-emphasized: cubic-bezier(.2, .8, .2, 1);
+
+      --max: 1760px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 90% 0%, rgba(76, 141, 255, .055), transparent 28%),
+        var(--bg);
+      font-family: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      text-rendering: optimizeLegibility;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .52;
+    }
+
+    svg {
+      display: block;
+    }
+
+    .mono {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    /* Shell */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 70;
+      height: 60px;
+      border-bottom: 1px solid rgba(220, 226, 233, .92);
+      background: rgba(255, 255, 255, .9);
+      backdrop-filter: blur(18px) saturate(1.15);
+    }
+
+    .topbar__inner {
+      width: min(var(--max), calc(100% - 34px));
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-strong);
+      font-size: 14px;
+      font-weight: 770;
+      letter-spacing: -.012em;
+    }
+
+    .brand__mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: white;
+      border-radius: 9px;
+      background: linear-gradient(145deg, #3157d5, #4c8dff);
+      box-shadow: 0 8px 18px rgba(49, 87, 213, .22);
+    }
+
+    .topbar__meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 10.8px;
+      font-weight: 650;
+    }
+
+    .live-dot {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      flex: none;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .live-dot::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border: 1px solid rgba(53, 208, 127, .35);
+      border-radius: 50%;
+      animation: ping 1.9s ease-out infinite;
+    }
+
+    @keyframes ping {
+      0% {
+        opacity: 0;
+        transform: scale(.65);
+      }
+      28% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(1.45);
+      }
+    }
+
+    .page {
+      width: min(var(--max), calc(100% - 34px));
+      margin: 0 auto;
+      padding: 18px 0 48px;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 11px;
+      color: var(--muted);
+      font-size: 10.8px;
+      font-weight: 620;
+    }
+
+    .breadcrumb strong {
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* Header */
+
+    .job-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 22px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .job-header__eyebrow {
+      margin-bottom: 4px;
+      color: var(--blue-deep);
+      font-size: 9.2px;
+      font-weight: 880;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .job-header h1 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 24px;
+      line-height: 1.16;
+      font-weight: 790;
+      letter-spacing: -.03em;
+    }
+
+    .job-header p {
+      max-width: 920px;
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 10.8px;
+      line-height: 1.48;
+    }
+
+    .job-header__actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .job-id {
+      max-width: 390px;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 8px 0 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-size: 10.2px;
+    }
+
+    .job-id__value {
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .icon-button {
+      width: 24px;
+      height: 24px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+    }
+
+    .icon-button:hover {
+      color: var(--text);
+      background: var(--surface-muted);
+    }
+
+    .icon-button:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .button {
+      min-height: 35px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 12px;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      background: linear-gradient(180deg, #ffffff, #fbfcfe);
+      box-shadow: 0 1px 2px rgba(16, 24, 40, .035);
+      font-size: 10.9px;
+      font-weight: 720;
+      letter-spacing: -.005em;
+      transition:
+        background var(--motion-fast) var(--ease-standard),
+        border-color var(--motion-fast) var(--ease-standard),
+        color var(--motion-fast) var(--ease-standard),
+        box-shadow var(--motion-fast) var(--ease-standard),
+        transform 90ms var(--ease-standard);
+    }
+
+    .button:hover:not(:disabled) {
+      border-color: #aab6c4;
+      background: #ffffff;
+      box-shadow: 0 5px 14px rgba(16, 24, 40, .07);
+    }
+
+    .button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    .button:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .button--primary {
+      color: white;
+      border-color: var(--blue-deep);
+      background: linear-gradient(180deg, #3b65df, #3157d5);
+      box-shadow: 0 8px 20px rgba(49, 87, 213, .2);
+    }
+
+    .button--primary:hover:not(:disabled) {
+      border-color: #2447bd;
+      background: #2447bd;
+    }
+
+    .button--danger {
+      color: var(--red-text);
+      border-color: #f6c9c6;
+      background: #fff6f5;
+    }
+
+    .button--danger:hover:not(:disabled) {
+      border-color: #efaea9;
+      background: var(--red-soft);
+    }
+
+    .button--block {
+      width: 100%;
+    }
+
+    .status {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 8px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .025em;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+
+    .status::before {
+      width: 15px;
+      height: 15px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, .58);
+      font-size: 8px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .status--running::before { content: "↻"; }
+    .status--done::before { content: "✓"; }
+    .status--pending::before { content: "…"; }
+    .status--failed::before { content: "!"; }
+    .status--neutral::before { content: "•"; }
+
+    .status--running {
+      color: #1764d8;
+      border-color: #cce0ff;
+      background: var(--blue-soft);
+    }
+
+    .status--done {
+      color: var(--green-text);
+      border-color: #c8edd8;
+      background: var(--green-soft);
+    }
+
+    .status--pending {
+      color: var(--amber-text);
+      border-color: #f1daa0;
+      background: var(--amber-soft);
+    }
+
+    .status--failed {
+      color: var(--red-text);
+      border-color: #f7c7c4;
+      background: var(--red-soft);
+    }
+
+    .status--neutral {
+      color: var(--muted);
+      border-color: var(--border);
+      background: var(--surface-muted);
+    }
+
+    /* Premium command deck */
+
+    .command-deck {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
+      border: 1px solid #1f2938;
+      border-radius: 16px;
+      background:
+        radial-gradient(circle at 85% 0%, rgba(76, 141, 255, .2), transparent 30%),
+        linear-gradient(140deg, var(--graphite), #111724 58%, #151c29);
+      box-shadow: 0 18px 46px rgba(11, 14, 20, .16);
+      color: var(--graphite-text);
+    }
+
+    .command-deck::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, .025) 1px, transparent 1px);
+      background-size: 26px 26px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.65), transparent);
+    }
+
+    .command-deck__body {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.25fr .9fr;
+      gap: 18px;
+      padding: 15px 16px;
+    }
+
+    .current-stage {
+      min-width: 0;
+    }
+
+    .current-stage__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .current-stage__top small {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--graphite-muted);
+      font-size: 8.8px;
+      font-weight: 820;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .current-stage__top strong {
+      display: block;
+      color: var(--graphite-text);
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 720;
+    }
+
+    .route-progress {
+      min-width: 680px;
+      display: grid;
+      grid-template-columns: minmax(120px, 1.15fr) repeat(4, 58px) minmax(120px, 1.15fr);
+      align-items: center;
+      gap: 8px;
+    }
+
+    .route-progress-wrap {
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .progress-node {
+      position: relative;
+      min-height: 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8px 9px;
+      border: 1px solid var(--graphite-border);
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .progress-node:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -8px;
+      z-index: 2;
+      width: 16px;
+      height: 16px;
+      display: grid;
+      place-items: center;
+      color: #7f8ba0;
+      border: 1px solid var(--graphite-border);
+      border-radius: 50%;
+      background: var(--graphite-2);
+      transform: translate(50%, -50%);
+      font-size: 8.5px;
+      font-weight: 900;
+    }
+
+    .progress-node small {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--graphite-muted);
+      font-size: 7.8px;
+      font-weight: 820;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .progress-node strong {
+      color: var(--graphite-text);
+      font-size: 9.4px;
+      line-height: 1.25;
+    }
+
+    .progress-node span {
+      margin-top: 2px;
+      color: var(--graphite-muted);
+      font-size: 8.6px;
+    }
+
+    .progress-node--stage {
+      align-items: center;
+      text-align: center;
+    }
+
+    .progress-node--stage strong {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #3b4659;
+      border-radius: 50%;
+      background: #1c2432;
+      color: #9ca8ba;
+      font-size: 9px;
+    }
+
+    .progress-node--done strong {
+      border-color: rgba(53, 208, 127, .45);
+      background: rgba(53, 208, 127, .14);
+      color: #bff3d2;
+    }
+
+    .progress-node--current strong {
+      border-color: rgba(76, 141, 255, .6);
+      background: rgba(76, 141, 255, .18);
+      color: #d8e8ff;
+      box-shadow: 0 0 0 4px rgba(76, 141, 255, .08);
+    }
+
+    .progress-node--current-target {
+      border-color: rgba(76, 141, 255, .48);
+      background: rgba(76, 141, 255, .1);
+      box-shadow: inset 0 0 0 1px rgba(76, 141, 255, .08);
+    }
+
+    .progress-node--current-target strong {
+      color: #e8f1ff;
+    }
+
+    .command-facts {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .command-fact {
+      min-height: 62px;
+      padding: 10px;
+      border: 1px solid var(--graphite-border);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .035);
+    }
+
+    .command-fact small {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--graphite-muted);
+      font-size: 8px;
+      font-weight: 820;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .command-fact strong {
+      display: block;
+      color: var(--graphite-text);
+      font-size: 10.2px;
+      line-height: 1.35;
+      font-weight: 690;
+    }
+
+    .command-fact span {
+      display: block;
+      margin-top: 2px;
+      color: var(--graphite-muted);
+      font-size: 8.9px;
+      line-height: 1.35;
+    }
+
+    /* Dashboard */
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 14px;
+      align-items: start;
+    }
+
+    .col-8 {
+      grid-column: span 8;
+    }
+
+    .col-4 {
+      grid-column: span 4;
+    }
+
+    .col-12 {
+      grid-column: 1 / -1;
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .panel {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid #d9e0e8;
+      border-radius: 15px;
+      background: linear-gradient(180deg, #ffffff, #fcfdff);
+      box-shadow: 0 1px 2px rgba(16, 24, 40, .035), 0 14px 36px rgba(16, 24, 40, .055);
+      transition:
+        border-color var(--motion-base) var(--ease-standard),
+        box-shadow var(--motion-base) var(--ease-standard);
+    }
+
+    .panel:hover {
+      border-color: #cfd8e3;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 17px 42px rgba(16, 24, 40, .065);
+    }
+
+    .panel__header {
+      min-height: 54px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .panel__header h2 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 12.5px;
+      font-weight: 770;
+      letter-spacing: -.012em;
+    }
+
+    .panel__header p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 9.9px;
+      line-height: 1.4;
+    }
+
+    .panel__body {
+      padding: 12px 14px 14px;
+    }
+
+    .count-badge {
+      min-height: 21px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 7px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      font-size: 8.8px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+
+    /* Execution workspace */
+
+    .execution-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(290px, .85fr);
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .timeline-rail {
+      max-height: 500px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+    }
+
+    .timeline-row {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+    }
+
+    .timeline-row--compact {
+      min-height: 40px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 9px;
+      padding: 0 10px;
+      background: var(--surface-soft);
+    }
+
+    .timeline-row__icon {
+      width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .timeline-row__icon--done {
+      color: var(--green-text);
+      background: var(--green-soft);
+    }
+
+    .timeline-row__icon--pending {
+      color: var(--amber-text);
+      background: var(--amber-soft);
+    }
+
+    .timeline-row__title {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 10.3px;
+      font-weight: 690;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .timeline-row__duration {
+      color: var(--muted);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .timeline-row--current {
+      padding: 11px;
+      border-left: 3px solid var(--blue);
+      background: linear-gradient(90deg, rgba(76, 141, 255, .045), transparent 40%);
+    }
+
+    .timeline-row__top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 9px;
+    }
+
+    .timeline-row__top h3 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 11.3px;
+      line-height: 1.35;
+      font-weight: 760;
+    }
+
+    .stage-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+    }
+
+    .data-box {
+      min-width: 0;
+      padding: 8px 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .data-box small {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 820;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+
+    .data-box strong {
+      display: block;
+      color: var(--text);
+      font-size: 9.6px;
+      line-height: 1.36;
+      font-weight: 660;
+      word-break: break-word;
+    }
+
+    .inline-tags {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .inline-tag {
+      min-height: 21px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 7px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      font-size: 8.8px;
+      font-weight: 690;
+    }
+
+    .execution-side {
+      display: grid;
+      align-content: start;
+      gap: 10px;
+    }
+
+    .side-block {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-soft);
+    }
+
+    .side-block__title {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-muted);
+      color: var(--muted);
+      font-size: 8.8px;
+      font-weight: 820;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .route-info-list {
+      display: grid;
+    }
+
+    .route-info-row {
+      min-height: 40px;
+      display: grid;
+      grid-template-columns: 98px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      padding: 7px 10px;
+      border-bottom: 1px solid #e7ebf0;
+      background: var(--surface);
+    }
+
+    .route-info-row:last-child {
+      border-bottom: 0;
+    }
+
+    .route-info-row span {
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .route-info-row strong {
+      min-width: 0;
+      color: var(--text);
+      font-size: 9.6px;
+      line-height: 1.35;
+      font-weight: 690;
+      word-break: break-word;
+    }
+
+    .gate-state {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 10px;
+      background: var(--surface);
+    }
+
+    .gate-state__icon {
+      width: 24px;
+      height: 24px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--green-text);
+      border-radius: 50%;
+      background: var(--green-soft);
+    }
+
+    .gate-state strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 10.2px;
+    }
+
+    .gate-state p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.4;
+    }
+
+
+    /* Unified execution + pipeline workspace */
+
+    .execution-command-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(360px, .82fr);
+      gap: 12px;
+      align-items: stretch;
+      min-width: 0;
+    }
+
+    .execution-pane {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      background: var(--surface-soft);
+    }
+
+    .execution-pane__head {
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-muted);
+    }
+
+    .execution-pane__head strong {
+      color: var(--text-strong);
+      font-size: 10.5px;
+      font-weight: 760;
+    }
+
+    .execution-pane__head span:not(.count-badge) {
+      color: var(--muted);
+      font-size: 8.9px;
+    }
+
+    .execution-pane__body {
+      padding: 9px;
+    }
+
+    .execution-pane--timeline .timeline-rail,
+    .execution-pane--pipeline .pipeline {
+      max-height: 480px;
+    }
+
+    .execution-pane--pipeline .pipeline-row {
+      grid-template-columns: 76px 128px minmax(0, 1fr) auto;
+    }
+
+    .execution-context-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .95fr .95fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .execution-context-card {
+      min-width: 0;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-soft);
+    }
+
+    .execution-context-card__label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 8.3px;
+      font-weight: 820;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .execution-context-card__value {
+      color: var(--text-strong);
+      font-size: 10.3px;
+      line-height: 1.4;
+      font-weight: 710;
+    }
+
+    .execution-context-card__subtext {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.4;
+    }
+
+    .context-route {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+    }
+
+    .context-route__node {
+      min-width: 0;
+    }
+
+    .context-route__node small {
+      display: block;
+      margin-bottom: 3px;
+      color: var(--muted);
+      font-size: 8px;
+      font-weight: 760;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .context-route__node strong {
+      display: block;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 9.5px;
+      line-height: 1.35;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .context-route__arrow {
+      color: var(--blue-deep);
+      font-size: 12px;
+      font-weight: 850;
+    }
+
+    .attention-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .attention-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 25px;
+      color: var(--muted);
+      font-size: 9px;
+    }
+
+    .attention-row strong {
+      color: var(--text);
+      font-size: 9.3px;
+      text-align: right;
+    }
+
+    @media (max-width: 1180px) {
+      .execution-command-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .execution-context-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .execution-context-card:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .execution-context-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .execution-context-card:first-child {
+        grid-column: auto;
+      }
+
+      .execution-pane--pipeline .pipeline-row {
+        grid-template-columns: 72px minmax(0, 1fr) auto;
+      }
+
+      .execution-pane--pipeline .pipeline-row__action {
+        grid-column: 2 / 4;
+      }
+    }
+
+    /* Pipeline */
+
+    .pipeline {
+      max-height: 434px;
+      overflow: auto;
+      display: grid;
+      gap: 5px;
+    }
+
+    .pipeline-row {
+      min-height: 38px;
+      display: grid;
+      grid-template-columns: 74px 128px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .pipeline-row__name {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--text);
+      font-size: 10.2px;
+      font-weight: 720;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .pipeline-row__action {
+      min-width: 0;
+      overflow: hidden;
+      display: -webkit-box;
+      color: var(--muted);
+      font-size: 9.7px;
+      line-height: 1.35;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .execution-pane__head--pipeline {
+      min-height: 48px;
+    }
+
+    .execution-pane__head--pipeline > div {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+
+    .pipeline-stream {
+      display: inline-flex !important;
+      align-items: center;
+      gap: 6px;
+      color: var(--green-text) !important;
+      font-size: 8.8px !important;
+      font-weight: 740;
+    }
+
+    .pipeline-stream__dot {
+      position: relative;
+      width: 6px;
+      height: 6px;
+      flex: none;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .pipeline-stream__dot::after {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border: 1px solid rgba(53, 208, 127, .32);
+      border-radius: 50%;
+      animation: streamPulse 1.8s var(--ease-standard) infinite;
+    }
+
+    @keyframes streamPulse {
+      0% { opacity: 0; transform: scale(.72); }
+      35% { opacity: 1; }
+      100% { opacity: 0; transform: scale(1.48); }
+    }
+
+    .pipeline-row {
+      position: relative;
+      min-height: 43px;
+      border-color: #dde3ea;
+      background: linear-gradient(180deg, #ffffff, #fbfcfe);
+      box-shadow: 0 1px 1px rgba(16, 24, 40, .025);
+      opacity: 0;
+      transform: translateY(5px);
+      animation: pipelineRowIn var(--motion-slow) var(--ease-emphasized) forwards;
+      animation-delay: calc(var(--row-index, 1) * 18ms);
+      transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        background var(--motion-fast) var(--ease-standard),
+        box-shadow var(--motion-fast) var(--ease-standard),
+        transform var(--motion-fast) var(--ease-standard);
+    }
+
+    .pipeline-row::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      bottom: 8px;
+      left: 0;
+      width: 2px;
+      border-radius: 999px;
+      background: var(--border-strong);
+    }
+
+    .pipeline-row--done::before {
+      background: var(--green);
+    }
+
+    .pipeline-row--pending::before {
+      background: var(--amber);
+    }
+
+    .pipeline-row:hover {
+      z-index: 1;
+      border-color: #cbd5e1;
+      background: #ffffff;
+      box-shadow: 0 7px 20px rgba(16, 24, 40, .07);
+      transform: translateY(-1px);
+    }
+
+    .pipeline-row--next {
+      border-color: #edd89c;
+      background: linear-gradient(180deg, #fffdf8, #fff9eb);
+    }
+
+    .pipeline-row--next::after {
+      content: "next";
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      color: var(--amber-text);
+      font-size: 7.2px;
+      font-weight: 850;
+      letter-spacing: .055em;
+      text-transform: uppercase;
+    }
+
+    .pipeline-row__name {
+      font-size: 10.4px;
+      font-weight: 730;
+      letter-spacing: -.008em;
+    }
+
+    .pipeline-row .count-badge {
+      color: #576174;
+      background: #f5f7fa;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 8.3px;
+    }
+
+    @keyframes pipelineRowIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Evidence */
+
+    .evidence-panel {
+      overflow: hidden;
+      border: 1px solid var(--graphite-border);
+      border-radius: 11px;
+      background: var(--graphite-panel);
+      color: var(--graphite-text);
+    }
+
+    .evidence-panel__header {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 11px;
+      border-bottom: 1px solid var(--graphite-border);
+      background: rgba(255, 255, 255, .02);
+      color: var(--graphite-muted);
+      font-size: 9.4px;
+      font-weight: 760;
+    }
+
+    .log-stream {
+      max-height: 300px;
+      overflow: auto;
+      padding: 7px 0;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 9.5px;
+      line-height: 1.45;
+    }
+
+    .log-line {
+      display: grid;
+      grid-template-columns: 66px 64px minmax(0, 1fr);
+      gap: 9px;
+      align-items: start;
+      padding: 4px 10px;
+    }
+
+    .log-line:hover {
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .log-line__time {
+      color: #8995a8;
+    }
+
+    .log-line__message {
+      color: var(--graphite-text);
+      word-break: break-word;
+    }
+
+    .log-tag {
+      min-height: 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      border-radius: 999px;
+      font-size: 8px;
+      font-weight: 830;
+      letter-spacing: .025em;
+    }
+
+    .log-tag--done {
+      color: #bff3d2;
+      background: rgba(53, 208, 127, .15);
+    }
+
+    .log-tag--running {
+      color: #c0dcff;
+      background: rgba(76, 141, 255, .17);
+    }
+
+    .log-tag--pending {
+      color: #ffe0a1;
+      background: rgba(245, 166, 35, .16);
+    }
+
+    details.raw-drawer {
+      margin-top: 9px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .raw-drawer summary {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 10px;
+      cursor: pointer;
+      list-style: none;
+      color: var(--text);
+      font-size: 10.2px;
+      font-weight: 700;
+    }
+
+    .raw-drawer summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .raw-drawer__body {
+      padding: 10px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 9.4px;
+      line-height: 1.55;
+    }
+
+
+    /* Compact evidence disclosure */
+
+    body.evidence-open {
+      overflow: hidden;
+    }
+
+    .current-stage__actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .deck-button {
+      min-height: 29px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 8px 0 9px;
+      color: #d8e8ff;
+      border: 1px solid rgba(134, 174, 237, .34);
+      border-radius: 999px;
+      background: rgba(76, 141, 255, .11);
+      font-size: 8.9px;
+      font-weight: 760;
+      white-space: nowrap;
+      transition: border-color .14s ease, background .14s ease, transform .08s ease;
+    }
+
+    .deck-button:hover {
+      border-color: rgba(151, 188, 247, .56);
+      background: rgba(76, 141, 255, .17);
+    }
+
+    .deck-button:active {
+      transform: translateY(1px);
+    }
+
+    .deck-button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(126, 174, 255, .2);
+    }
+
+    .deck-button__count {
+      min-width: 19px;
+      height: 19px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0 5px;
+      color: #dceaff;
+      border: 1px solid rgba(155, 190, 244, .32);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .08);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 7.8px;
+      font-weight: 780;
+    }
+
+    .evidence-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 116;
+      background: rgba(11, 14, 20, .32);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+    }
+
+    .evidence-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .evidence-drawer {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      bottom: 0;
+      z-index: 117;
+      width: min(560px, 100vw);
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+      box-shadow: -22px 0 70px rgba(16, 24, 40, .2);
+      transform: translateX(104%);
+      transition: transform .2s ease;
+    }
+
+    .evidence-drawer.open {
+      transform: translateX(0);
+    }
+
+    .evidence-drawer__header {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, .96);
+    }
+
+    .evidence-drawer__title {
+      min-width: 0;
+    }
+
+    .evidence-drawer__title strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 12px;
+      font-weight: 770;
+    }
+
+    .evidence-drawer__title span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 9.4px;
+      line-height: 1.35;
+    }
+
+    .evidence-drawer__actions {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+    }
+
+    .evidence-drawer__body {
+      min-height: 0;
+      overflow: auto;
+      padding: 13px 14px 16px;
+      background: var(--surface-soft);
+    }
+
+    .evidence-drawer__toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 9px;
+      flex-wrap: wrap;
+    }
+
+    .evidence-drawer__toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .evidence-drawer .evidence-panel {
+      box-shadow: 0 12px 30px rgba(11, 14, 20, .12);
+    }
+
+    .evidence-drawer .log-stream {
+      max-height: none;
+      height: min(430px, calc(100vh - 280px));
+    }
+
+    .evidence-drawer__footer {
+      padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 8.9px;
+      line-height: 1.4;
+    }
+
+    @media (max-width: 760px) {
+      .current-stage__top {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .current-stage__actions {
+        justify-content: space-between;
+      }
+
+      .evidence-drawer {
+        top: 58px;
+        width: 100vw;
+      }
+    }
+
+    /* Job details */
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 0 14px 10px;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .tab {
+      min-height: 29px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-soft);
+      font-size: 9.6px;
+      font-weight: 760;
+    }
+
+    .tab.active {
+      color: #2047c5;
+      border-color: #cfe0ff;
+      background: var(--blue-soft);
+    }
+
+    .tab:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .tab-panel {
+      display: none;
+      padding: 12px 14px 14px;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .quiet-empty {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      padding: 10px 11px;
+      color: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+      font-size: 10.2px;
+    }
+
+    .approvals-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 9px;
+      flex-wrap: wrap;
+    }
+
+    .approvals-top strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 10.6px;
+    }
+
+    .approvals-top span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 9.3px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--text);
+      font-size: 9.8px;
+      font-weight: 710;
+    }
+
+    .toggle input {
+      width: 15px;
+      height: 15px;
+      margin: 0;
+      accent-color: var(--blue-deep);
+    }
+
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .decision {
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .decision__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .decision__top strong {
+      color: var(--text-strong);
+      font-size: 10.3px;
+    }
+
+    .decision p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.45;
+    }
+
+    .report-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .report {
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .report strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-strong);
+      font-size: 10.5px;
+    }
+
+    .report p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 9.3px;
+      line-height: 1.45;
+    }
+
+    .report .button {
+      margin-top: 9px;
+    }
+
+    .upload {
+      padding: 10px 11px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-soft);
+    }
+
+    .upload strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-strong);
+      font-size: 10.6px;
+    }
+
+    .upload p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 9.3px;
+      line-height: 1.45;
+    }
+
+    .upload__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+    }
+
+    .file-name {
+      min-height: 34px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 9px;
+      color: var(--muted);
+      border: 1px dashed var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface);
+      font-size: 9.6px;
+    }
+
+    .hidden-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Liquid assistant */
+
+    .assistant-launcher {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 100;
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      color: #173770;
+      border: 1px solid rgba(255, 255, 255, .72);
+      border-radius: 20px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .78), rgba(224, 236, 255, .56));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .9),
+        0 14px 40px rgba(43, 86, 164, .24);
+      backdrop-filter: blur(20px) saturate(1.45);
+      -webkit-backdrop-filter: blur(20px) saturate(1.45);
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+
+    .assistant-launcher::before {
+      content: "";
+      position: absolute;
+      inset: 5px 8px auto 8px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, rgba(255,255,255,.75), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    .assistant-launcher:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .96),
+        0 18px 48px rgba(43, 86, 164, .28);
+    }
+
+    .assistant-launcher:focus-visible {
+      outline: none;
+      box-shadow: var(--focus), 0 18px 48px rgba(43, 86, 164, .28);
+    }
+
+    .assistant-launcher__badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      min-width: 19px;
+      height: 19px;
+      display: grid;
+      place-items: center;
+      padding: 0 5px;
+      color: white;
+      border: 2px solid white;
+      border-radius: 999px;
+      background: var(--blue-deep);
+      font-size: 8px;
+      font-weight: 820;
+    }
+
+    .assistant-popover {
+      position: fixed;
+      right: 22px;
+      bottom: 92px;
+      z-index: 101;
+      width: min(410px, calc(100vw - 28px));
+      height: min(590px, calc(100vh - 126px));
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, .74);
+      border-radius: 22px;
+      background:
+        linear-gradient(160deg, rgba(255, 255, 255, .88), rgba(244, 248, 255, .78));
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .96),
+        0 28px 80px rgba(23, 45, 84, .24);
+      backdrop-filter: blur(26px) saturate(1.4);
+      -webkit-backdrop-filter: blur(26px) saturate(1.4);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(14px) scale(.96);
+      transform-origin: bottom right;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+
+    .assistant-popover.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .assistant-popover__header {
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 11px 12px 10px 14px;
+      border-bottom: 1px solid rgba(199, 208, 219, .74);
+      background: rgba(255, 255, 255, .44);
+    }
+
+    .assistant-identity {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .assistant-identity__icon {
+      width: 34px;
+      height: 34px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--blue-deep);
+      border: 1px solid rgba(255, 255, 255, .7);
+      border-radius: 12px;
+      background: rgba(237, 244, 255, .8);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
+    }
+
+    .assistant-identity strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 11px;
+    }
+
+    .assistant-identity span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 8.8px;
+    }
+
+    .assistant-popover__messages {
+      min-height: 0;
+      overflow: auto;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      padding: 13px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.46), transparent 28%);
+    }
+
+    .assistant-empty {
+      min-height: 200px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      text-align: center;
+      border: 1px dashed rgba(169, 182, 199, .7);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, .36);
+    }
+
+    .assistant-empty__icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 9px;
+      color: var(--blue-deep);
+      border-radius: 15px;
+      background: rgba(237, 244, 255, .82);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.95);
+    }
+
+    .assistant-empty strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 11.2px;
+    }
+
+    .assistant-empty p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 9.5px;
+      line-height: 1.5;
+    }
+
+    .chat-message {
+      max-width: 330px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .chat-message--user {
+      justify-self: end;
+      flex-direction: row-reverse;
+    }
+
+    .chat-avatar {
+      width: 25px;
+      height: 25px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--blue-deep);
+      border: 1px solid rgba(255,255,255,.7);
+      border-radius: 50%;
+      background: rgba(237, 244, 255, .85);
+    }
+
+    .chat-message--user .chat-avatar {
+      color: #475467;
+      background: rgba(240, 243, 247, .88);
+    }
+
+    .chat-bubble {
+      padding: 9px 10px;
+      border: 1px solid rgba(199, 208, 219, .7);
+      border-radius: 13px;
+      background: rgba(255, 255, 255, .66);
+      box-shadow: 0 4px 14px rgba(16, 24, 40, .04);
+    }
+
+    .chat-message--assistant .chat-bubble {
+      border-color: rgba(173, 201, 247, .75);
+      background: rgba(244, 249, 255, .78);
+    }
+
+    .chat-message--user .chat-bubble {
+      background: rgba(247, 248, 250, .78);
+    }
+
+    .chat-bubble__meta {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 8.2px;
+      font-weight: 760;
+    }
+
+    .chat-bubble__text {
+      color: var(--text);
+      font-size: 9.8px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .assistant-popover__composer {
+      padding: 10px 12px 11px;
+      border-top: 1px solid rgba(199, 208, 219, .74);
+      background: rgba(255, 255, 255, .44);
+    }
+
+    .glass-composer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      padding: 6px 6px 6px 10px;
+      border: 1px solid rgba(184, 196, 211, .75);
+      border-radius: 15px;
+      background: rgba(255, 255, 255, .62);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .85);
+    }
+
+    .glass-composer textarea {
+      width: 100%;
+      min-height: 34px;
+      max-height: 92px;
+      padding: 7px 0;
+      resize: none;
+      color: var(--text);
+      border: 0;
+      outline: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 9.9px;
+      line-height: 1.4;
+    }
+
+    .assistant-send {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: white;
+      border: 0;
+      border-radius: 11px;
+      background: var(--blue-deep);
+      box-shadow: 0 6px 14px rgba(49, 87, 213, .22);
+    }
+
+    .assistant-send:hover {
+      background: #2447bd;
+    }
+
+    .assistant-send:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .assistant-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 8.4px;
+      line-height: 1.4;
+    }
+
+    /* Toast / modal */
+
+    .toast {
+      position: fixed;
+      left: 18px;
+      bottom: 18px;
+      z-index: 110;
+      width: min(340px, calc(100vw - 24px));
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 18px 52px rgba(16, 24, 40, .16);
+      opacity: 0;
+      transform: translateY(120%);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast__icon {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--green-text);
+      border-radius: 50%;
+      background: var(--green-soft);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .toast strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text-strong);
+      font-size: 10.7px;
+    }
+
+    .toast p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 9.7px;
+      line-height: 1.45;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 130;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15, 23, 40, .52);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal-backdrop.show {
+      display: grid;
+    }
+
+    .modal {
+      width: min(410px, 100%);
+      padding: 21px;
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 28px 90px rgba(16, 24, 40, .3);
+      text-align: center;
+    }
+
+    .modal__icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 11px;
+      color: var(--red-text);
+      border-radius: 50%;
+      background: var(--red-soft);
+    }
+
+    .modal h2 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 17px;
+      letter-spacing: -.02em;
+    }
+
+    .modal p {
+      margin: 8px 0 15px;
+      color: var(--muted);
+      font-size: 10.4px;
+      line-height: 1.5;
+    }
+
+    .modal__actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Responsive */
+
+    @media (max-width: 1380px) {
+      .col-8,
+      .col-4 {
+        grid-column: 1 / -1;
+      }
+
+      .command-deck__body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .job-header {
+        grid-template-columns: 1fr;
+      }
+
+      .job-header__actions {
+        justify-content: flex-start;
+      }
+
+      .execution-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .command-facts {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .decision-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar__inner,
+      .page {
+        width: min(var(--max), calc(100% - 22px));
+      }
+
+      .topbar__meta {
+        display: none;
+      }
+
+      .job-header__actions {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .job-id,
+      .job-header__actions .button,
+      .job-header__actions .status {
+        width: 100%;
+        max-width: none;
+      }
+
+      .command-facts {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .stage-detail-grid,
+      .report-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-row {
+        grid-template-columns: 72px minmax(0, 1fr) auto;
+      }
+
+      .pipeline-row__action {
+        grid-column: 2 / 4;
+      }
+
+      .tabs {
+        gap: 5px;
+      }
+
+      .tab {
+        flex: 1 1 auto;
+      }
+
+      .assistant-launcher {
+        right: 14px;
+        bottom: 14px;
+      }
+
+      .assistant-popover {
+        right: 14px;
+        bottom: 82px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M5 7h9M5 12h14M10 17h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="m15 4 4 3-4 3M9 14l-4 3 4 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Migration Factory
+      </div>
+
+      <div class="topbar__meta">
+        <span style="display:inline-flex;align-items:center;gap:8px">
+          <span class="live-dot"></span>
+          Live migration state
+        </span>
+        <span>Control tower</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <span>Migrations</span>
+      <span>›</span>
+      <strong>Migration cockpit</strong>
+    </nav>
+
+    <section class="job-header">
+      <div>
+        <div class="job-header__eyebrow">V3.3 migration cockpit</div>
+        <h1>Spring Boot migration in progress</h1>
+        <p>Current execution, route context, backend-owned evidence, approvals, and proof—structured around what requires attention now.</p>
+      </div>
+
+      <div class="job-header__actions">
+        <div class="job-id" title="71e0f63a9d834c9b998782cbe56ed855">
+          <span class="mono job-id__value" id="jobIdValue">71e0f63a9d834c9b998782cbe56ed855</span>
+          <button class="icon-button" id="copyJobIdButton" type="button" aria-label="Copy job ID">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <rect x="9" y="9" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <span class="status status--running">Running</span>
+        <button class="button button--danger" id="cancelButton" type="button">Cancel migration</button>
+      </div>
+    </section>
+
+    <section class="command-deck" aria-label="Current migration command deck">
+      <div class="command-deck__body">
+        <div class="current-stage">
+          <div class="current-stage__top">
+            <div>
+              <small>Current execution</small>
+              <strong>Route complete · result contract and final report are pending</strong>
+            </div>
+            <div class="current-stage__actions">
+              <span class="status status--running">Running</span>
+
+              <button
+                class="deck-button"
+                id="evidenceButton"
+                type="button"
+                aria-expanded="false"
+                aria-controls="evidenceDrawer"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M5 5h14M5 9h14M5 13h8M5 17h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+                <span>Evidence &amp; logs</span>
+                <span class="deck-button__count" id="evidenceCount">6</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="route-progress-wrap">
+            <div class="route-progress">
+              <div class="progress-node">
+                <small>Source</small>
+                <strong>Spring Boot 2.1</strong>
+                <span>Java 11</span>
+              </div>
+
+              <div class="progress-node progress-node--stage progress-node--done">
+                <small>Stage</small>
+                <strong>✓</strong>
+              </div>
+
+              <div class="progress-node progress-node--stage progress-node--done">
+                <small>Stage</small>
+                <strong>✓</strong>
+              </div>
+
+              <div class="progress-node progress-node--stage progress-node--done">
+                <small>Stage</small>
+                <strong>✓</strong>
+              </div>
+
+              <div class="progress-node progress-node--stage progress-node--done">
+                <small>Stage</small>
+                <strong>✓</strong>
+              </div>
+
+              <div class="progress-node progress-node--current-target">
+                <small>Target</small>
+                <strong>Spring Boot 4.0</strong>
+                <span>Java 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="command-facts">
+          <div class="command-fact">
+            <small>Open gate</small>
+            <strong>None</strong>
+            <span>No action required</span>
+          </div>
+
+          <div class="command-fact">
+            <small>Continuation</small>
+            <strong class="mono">auto_on_green</strong>
+            <span>Continue on pass</span>
+          </div>
+
+          <div class="command-fact">
+            <small>Approval mode</small>
+            <strong>Auto approval ON</strong>
+            <span>Gates auto-approved</span>
+          </div>
+
+          <div class="command-fact">
+            <small>Route validation</small>
+            <strong>Valid</strong>
+            <span>Stages 2, 3, 4</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <section class="panel col-12">
+        <header class="panel__header">
+          <div>
+            <h2>Execution control</h2>
+            <p>Route completion, validation results, and all backend pipeline phases in one synchronized workspace.</p>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end">
+            <span class="count-badge">Route complete</span>
+            <span class="count-badge">8 / 13 phases passed</span>
+          </div>
+        </header>
+
+        <div class="panel__body">
+          <div class="execution-command-grid">
+            <section class="execution-pane execution-pane--timeline">
+              <div class="execution-pane__head">
+                <strong>Route transition</strong>
+                <span>Route complete · finalization is the active transition</span>
+              </div>
+
+              <div class="execution-pane__body">
+                <div class="timeline-rail">
+                  <div class="timeline">
+                    <article class="timeline-row timeline-row--compact">
+                      <span class="timeline-row__icon timeline-row__icon--done">✓</span>
+                      <div class="timeline-row__title">Route step 1 · springboot-2.1-java11 → springboot-2.7-java11</div>
+                      <div class="timeline-row__duration mono">06m 24s</div>
+                    </article>
+
+                    <article class="timeline-row timeline-row--compact">
+                      <span class="timeline-row__icon timeline-row__icon--done">✓</span>
+                      <div class="timeline-row__title">Route step 2 · springboot-2.7-java11 → springboot-3.5-java17</div>
+                      <div class="timeline-row__duration mono">09m 11s</div>
+                    </article>
+
+                    <article class="timeline-row timeline-row--compact">
+                      <span class="timeline-row__icon timeline-row__icon--done">✓</span>
+                      <div class="timeline-row__title">Route step 3 · springboot-3.5-java17 → springboot-3.5-java21</div>
+                      <div class="timeline-row__duration mono">07m 38s</div>
+                    </article>
+
+                    <article class="timeline-row timeline-row--compact">
+                      <span class="timeline-row__icon timeline-row__icon--done">✓</span>
+                      <div class="timeline-row__title">Route step 4 · springboot-3.5-java21 → springboot-4.0-java21</div>
+                      <div class="timeline-row__duration">Completed</div>
+                    </article>
+
+                    <article class="timeline-row timeline-row--current">
+                      <div class="timeline-row__top">
+                        <div>
+                          <h3>Finalization · result contract and final report</h3>
+                          <div class="inline-tags">
+                            <span class="inline-tag mono">current transition</span>
+                            <span class="inline-tag mono">stream connected</span>
+                          </div>
+                        </div>
+
+                        <span class="status status--running">Running</span>
+                      </div>
+
+                      <div class="stage-detail-grid">
+                        <div class="data-box">
+                          <small>Transform Agent</small>
+                          <strong>Sandbox transform completed</strong>
+                        </div>
+
+                        <div class="data-box">
+                          <small>Build Agent</small>
+                          <strong>Sandbox build completed</strong>
+                        </div>
+
+                        <div class="data-box">
+                          <small>Test Validation</small>
+                          <strong>PASS_WITH_WARNINGS</strong>
+                        </div>
+
+                        <div class="data-box">
+                          <small>Stage Report</small>
+                          <strong>Final report written</strong>
+                        </div>
+
+                        <div class="data-box">
+                          <small>Next transition</small>
+                          <strong>Result Contract and Final Report</strong>
+                        </div>
+
+                        <div class="data-box">
+                          <small>Final Report artifacts</small>
+                          <strong>8 artifacts reported</strong>
+                        </div>
+                      </div>
+
+                      <div class="inline-tags">
+                        <span class="inline-tag">stage_report PASS</span>
+                        <span class="inline-tag">PASS_WITH_WARNINGS</span>
+                        <span class="inline-tag">result_contract pending</span>
+                        <span class="inline-tag">final_report pending</span>
+                      </div>
+                    </article>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="execution-pane execution-pane--pipeline">
+              <div class="execution-pane__head execution-pane__head--pipeline">
+                <div>
+                  <strong>Pipeline status</strong>
+                  <span class="pipeline-stream"><span class="pipeline-stream__dot"></span>Stream: connected</span>
+                </div>
+                <span class="count-badge">8 / 13 passed</span>
+              </div>
+
+              <div class="execution-pane__body">
+                <div class="pipeline">
+                  <div class="pipeline-row pipeline-row--pending" style="--row-index:1">
+                    <span class="status status--pending">Pending</span>
+                    <div class="pipeline-row__name">Preflight</div>
+                    <div class="pipeline-row__action" title="V2 migration job created.">V2 migration job created.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--pending" style="--row-index:2">
+                    <span class="status status--pending">Pending</span>
+                    <div class="pipeline-row__name">Cancellation</div>
+                    <div class="pipeline-row__action" title="Waiting for backend-owned evidence.">Waiting for backend-owned evidence.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:3">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Analysis Agent</div>
+                    <div class="pipeline-row__action" title="analysis phase completed.">analysis phase completed.</div>
+                    <span class="count-badge">48 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:4">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Planning Agent</div>
+                    <div class="pipeline-row__action" title="planning phase completed.">planning phase completed.</div>
+                    <span class="count-badge">41 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:5">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Assessment Agent</div>
+                    <div class="pipeline-row__action" title="assessment phase completed.">assessment phase completed.</div>
+                    <span class="count-badge">22 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:6">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Human Approval</div>
+                    <div class="pipeline-row__action" title="Human approval phase complete; sandbox transform has started.">Human approval phase complete; sandbox transform has started.</div>
+                    <span class="count-badge">4 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:7">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Transform Agent</div>
+                    <div class="pipeline-row__action" title="Sandbox transform completed.">Sandbox transform completed.</div>
+                    <span class="count-badge">24 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:8">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Build Agent</div>
+                    <div class="pipeline-row__action" title="Sandbox build completed.">Sandbox build completed.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:9">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Test Validation</div>
+                    <div class="pipeline-row__action" title="Sandbox tests accepted with status: PASS_WITH_WARNINGS.">Sandbox tests accepted with status: PASS_WITH_WARNINGS.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--pending" style="--row-index:10">
+                    <span class="status status--pending">Pending</span>
+                    <div class="pipeline-row__name">Repair/Failure</div>
+                    <div class="pipeline-row__action" title="Waiting for backend-owned evidence.">Waiting for backend-owned evidence.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--pending" style="--row-index:11">
+                    <span class="status status--pending">Pending</span>
+                    <div class="pipeline-row__name">Result Contract</div>
+                    <div class="pipeline-row__action" title="Waiting for backend-owned evidence.">Waiting for backend-owned evidence.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--pending pipeline-row--next" style="--row-index:12">
+                    <span class="status status--pending">Pending</span>
+                    <div class="pipeline-row__name">Final Report</div>
+                    <div class="pipeline-row__action" title="Waiting for backend-owned evidence.">Waiting for backend-owned evidence.</div>
+                    <span class="count-badge">8 artifacts</span>
+                  </div>
+                  <div class="pipeline-row pipeline-row--done" style="--row-index:13">
+                    <span class="status status--done">Pass</span>
+                    <div class="pipeline-row__name">Stage Report</div>
+                    <div class="pipeline-row__action" title="Final report written.">Final report written.</div>
+                    <span class="count-badge">0 artifacts</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="execution-context-grid">
+            <section class="execution-context-card">
+              <div class="execution-context-card__label">
+                <span>Route context</span>
+                <span class="mono">backend</span>
+              </div>
+
+              <div class="context-route">
+                <div class="context-route__node">
+                  <small>Source</small>
+                  <strong>Spring Boot 2.1 / Java 11</strong>
+                </div>
+
+                <div class="context-route__arrow">→</div>
+
+                <div class="context-route__node">
+                  <small>Target</small>
+                  <strong>Spring Boot 4.0 / Java 21</strong>
+                </div>
+              </div>
+
+              <div class="execution-context-card__subtext mono">run-config-71e0f63a9d834c9b998782cbe56ed855 · included stages 2, 3, 4</div>
+            </section>
+
+            <section class="execution-context-card">
+              <div class="execution-context-card__label">
+                <span>Gate &amp; approval</span>
+                <span class="status status--done">Clear</span>
+              </div>
+
+              <div class="execution-context-card__value">No gate is currently open</div>
+              <div class="execution-context-card__subtext">Stage 4 is auto approved and complete. Gate data remains backend-owned and checksum-protected.</div>
+            </section>
+
+            <section class="execution-context-card">
+              <div class="execution-context-card__label">
+                <span>Attention</span>
+                <span class="status status--neutral">No action</span>
+              </div>
+
+              <div class="attention-list">
+                <div class="attention-row">
+                  <span>Repair state</span>
+                  <strong class="mono">not_attempted</strong>
+                </div>
+
+                <div class="attention-row">
+                  <span>Final report</span>
+                  <strong>Pending · 8 artifacts</strong>
+                </div>
+
+                <div class="attention-row">
+                  <span>Dependency compare</span>
+                  <strong>Stage complete · available</strong>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel col-12">
+        <header class="panel__header">
+          <div>
+            <h2>Job details</h2>
+            <p>Approvals, repair, reports, and dependency comparison remain available without competing with the live execution surface.</p>
+          </div>
+        </header>
+
+        <div class="tabs" id="jobTabs">
+          <button class="tab active" type="button" data-tab="approvals">Approval Decisions</button>
+          <button class="tab" type="button" data-tab="repair">Repair Proposal</button>
+          <button class="tab" type="button" data-tab="reports">Proof & Reports</button>
+          <button class="tab" type="button" data-tab="dependencies">Target Dependency Versions</button>
+        </div>
+
+        <div class="tab-panel active" data-panel="approvals">
+          <div class="approvals-top">
+            <div>
+              <strong>Auto Approval ON</strong>
+              <span>Successful approval gates are approved automatically.</span>
+            </div>
+
+            <label class="toggle">
+              <input type="checkbox" checked />
+              <span>On</span>
+            </label>
+          </div>
+
+          <div class="decision-grid">
+            <article class="decision">
+              <div class="decision__top">
+                <strong>Stage 4</strong>
+                <span class="status status--done">Auto approved</span>
+              </div>
+              <p>Pre-transform review required before sandbox transform.<br/>
+                Checksum <span class="mono">b8a55799df…</span><br/>
+                Timestamp 2026-07-18T08:35:25.906960Z
+              </p>
+            </article>
+
+            <article class="decision">
+              <div class="decision__top">
+                <strong>Stage 3</strong>
+                <span class="status status--done">Auto approved</span>
+              </div>
+              <p>Pre-transform review required before sandbox transform.<br/>
+                Checksum <span class="mono">8220e369d4…</span><br/>
+                Timestamp 2026-07-18T08:23:05.561601Z
+              </p>
+            </article>
+
+            <article class="decision">
+              <div class="decision__top">
+                <strong>Stage 2</strong>
+                <span class="status status--done">Auto approved</span>
+              </div>
+              <p>Pre-transform review required before sandbox transform.<br/>
+                Checksum <span class="mono">ac34c2c03…</span><br/>
+                Timestamp 2026-07-18T08:08:09.091528Z
+              </p>
+            </article>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="repair">
+          <div class="quiet-empty">No repair attempted yet.</div>
+        </div>
+
+        <div class="tab-panel" data-panel="reports">
+          <div class="report-grid">
+            <article class="report">
+              <strong>Proof & Report</strong>
+              <p>Final proof report is generated when all three deterministic gates pass.</p>
+            </article>
+
+            <article class="report">
+              <strong>Final Report</strong>
+              <p>Stage 4 is running. No accepted Stage 4 output artifact revision exists yet, so report generation is unavailable.</p>
+              <button class="button" type="button" disabled>Generate report</button>
+            </article>
+          </div>
+        </div>
+
+        <div class="tab-panel" data-panel="dependencies">
+          <article class="upload">
+            <strong>Target Dependency Versions</strong>
+            <p>Upload a CSV or Excel .xlsx file to compare target dependency versions with the latest completed stage root pom.xml. No file changes until Change is selected.</p>
+
+            <div class="upload__actions">
+              <input class="hidden-input" type="file" id="dependencyFile" accept=".csv,.xlsx,.xls" />
+              <button class="button" id="chooseFileButton" type="button">Choose file</button>
+              <span class="file-name mono" id="selectedFileName">No file selected</span>
+              <button class="button button--primary" id="changeDependenciesButton" type="button">Change</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+
+
+  <div class="evidence-backdrop" id="evidenceBackdrop" aria-hidden="true"></div>
+
+  <aside
+    class="evidence-drawer"
+    id="evidenceDrawer"
+    aria-label="Evidence and live logs"
+    aria-hidden="true"
+  >
+    <header class="evidence-drawer__header">
+      <div class="evidence-drawer__title">
+        <strong>Evidence &amp; live logs</strong>
+        <span>Hidden by default. Open only when you need operational detail for the current route step.</span>
+      </div>
+
+      <div class="evidence-drawer__actions">
+        <span class="status status--running">Streaming</span>
+
+        <button class="icon-button" id="closeEvidenceButton" type="button" aria-label="Close evidence and logs">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="evidence-drawer__body">
+      <div class="evidence-drawer__toolbar">
+        <div class="evidence-drawer__toolbar-group">
+          <span class="count-badge mono">route_step=4</span>
+          <span class="count-badge" id="drawerEventCount">6 events</span>
+          <span class="count-badge mono">auto-follow</span>
+        </div>
+
+        <button class="button" id="latestLogButton" type="button">Latest</button>
+      </div>
+
+      <div class="evidence-panel">
+        <div class="evidence-panel__header">
+          <span>Evidence stream</span>
+          <span class="mono">backend-owned</span>
+        </div>
+
+        <div class="log-stream" id="logStream">
+          <div class="log-line">
+            <div class="log-line__time">18:35:25</div>
+            <div><span class="log-tag log-tag--done">DONE</span></div>
+            <div class="log-line__message">sandbox_transform completed artifacts=24</div>
+          </div>
+
+          <div class="log-line">
+            <div class="log-line__time">18:36:12</div>
+            <div><span class="log-tag log-tag--done">DONE</span></div>
+            <div class="log-line__message">sandbox_build completed</div>
+          </div>
+
+          <div class="log-line">
+            <div class="log-line__time">18:37:04</div>
+            <div><span class="log-tag log-tag--done">DONE</span></div>
+            <div class="log-line__message">sandbox_tests accepted status=PASS_WITH_WARNINGS</div>
+          </div>
+
+          <div class="log-line">
+            <div class="log-line__time">18:37:31</div>
+            <div><span class="log-tag log-tag--done">DONE</span></div>
+            <div class="log-line__message">stage_report final report written</div>
+          </div>
+
+          <div class="log-line">
+            <div class="log-line__time">18:37:44</div>
+            <div><span class="log-tag log-tag--pending">PENDING</span></div>
+            <div class="log-line__message">result_contract waiting for backend-owned evidence</div>
+          </div>
+
+          <div class="log-line">
+            <div class="log-line__time">18:37:45</div>
+            <div><span class="log-tag log-tag--pending">PENDING</span></div>
+            <div class="log-line__message">final_report waiting for backend-owned evidence artifacts=8</div>
+          </div>
+        </div>
+      </div>
+
+      <details class="raw-drawer">
+        <summary>
+          <span>Raw logs</span>
+          <span style="color:var(--muted)">expand</span>
+        </summary>
+
+        <div class="raw-drawer__body mono">
+          18:35:25 phase=transform status=PASS artifacts=24<br/>
+          18:36:12 phase=build status=PASS artifacts=0<br/>
+          18:37:04 phase=test_validation status=PASS_WITH_WARNINGS artifacts=0<br/>
+          18:37:31 phase=stage_report status=PASS message="Final report written."<br/>
+          18:37:44 phase=result_contract status=PENDING<br/>
+          18:37:45 phase=final_report status=PENDING artifacts=8
+        </div>
+      </details>
+    </div>
+
+    <footer class="evidence-drawer__footer">
+      Logs remain available without occupying the primary cockpit. Press Escape or select the close button to return to the execution view.
+    </footer>
+  </aside>
+
+  <!-- Liquid-glass assistant -->
+  <button class="assistant-launcher" id="assistantLauncher" type="button" aria-label="Open migration assistant" aria-expanded="false">
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
+      <path d="M7 17.5 4.5 20v-4.2A7.5 7.5 0 1 1 19.5 12 7.5 7.5 0 0 1 7 17.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+      <path d="M9 10.5h6M9 13.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span class="assistant-launcher__badge">1</span>
+  </button>
+
+  <aside class="assistant-popover" id="assistantPopover" aria-label="Migration assistant">
+    <header class="assistant-popover__header">
+      <div class="assistant-identity">
+        <span class="assistant-identity__icon" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M7 17.5 4.5 20v-4.2A7.5 7.5 0 1 1 19.5 12 7.5 7.5 0 0 1 7 17.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M9 10.5h6M9 13.5h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </span>
+
+        <div>
+          <strong>Migration assistant</strong>
+          <span>Model unavailable · deterministic context</span>
+        </div>
+      </div>
+
+      <button class="icon-button" id="closeAssistantButton" type="button" aria-label="Close assistant">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
+
+    <div class="assistant-popover__messages" id="assistantMessages">
+      <div class="assistant-empty" id="assistantEmpty">
+        <div>
+          <div class="assistant-empty__icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 17v.01M8.2 9a4 4 0 1 1 7.6 2c-.8 1-1.8 1.6-2.4 2.5-.35.5-.4.9-.4 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <strong>Ask what is happening</strong>
+          <p>Ask about the current stage, evidence, approvals, gates, or why the pipeline is waiting.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="assistant-popover__composer">
+      <div class="glass-composer">
+        <textarea id="assistantInput" placeholder="Ask about this migration"></textarea>
+        <button class="assistant-send" id="assistantSendButton" type="button" aria-label="Send message">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="m4 4 16 8-16 8 3-8-3-8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M7 12h13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="assistant-note">Cannot execute, approve, write files, change the route, or override proof.</div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="toast__icon">✓</div>
+    <div>
+      <strong id="toastTitle">Done</strong>
+      <p id="toastMessage">Action completed.</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="cancelModal" role="dialog" aria-modal="true" aria-labelledby="cancelTitle">
+    <div class="modal">
+      <div class="modal__icon">
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
+          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <h2 id="cancelTitle">Cancel this migration?</h2>
+      <p>This prototype keeps job state in the browser. In the real application, confirmation should call the existing backend cancellation action.</p>
+
+      <div class="modal__actions">
+        <button class="button" id="keepRunningButton" type="button">Keep running</button>
+        <button class="button button--danger" id="confirmCancelButton" type="button">Confirm cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+    function showToast(title, message) {
+      $("#toastTitle").textContent = title;
+      $("#toastMessage").textContent = message;
+      $("#toast").classList.add("show");
+
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => {
+        $("#toast").classList.remove("show");
+      }, 2800);
+    }
+
+    // Job ID.
+    $("#copyJobIdButton").addEventListener("click", async () => {
+      const value = $("#jobIdValue").textContent.trim();
+
+      try {
+        await navigator.clipboard.writeText(value);
+        showToast("Job ID copied", "The migration job ID was copied.");
+      } catch {
+        showToast("Copy unavailable", "Clipboard access is not available in this browser.");
+      }
+    });
+
+    // Cancel migration.
+    $("#cancelButton").addEventListener("click", () => {
+      $("#cancelModal").classList.add("show");
+    });
+
+    $("#keepRunningButton").addEventListener("click", () => {
+      $("#cancelModal").classList.remove("show");
+    });
+
+    $("#confirmCancelButton").addEventListener("click", () => {
+      $("#cancelModal").classList.remove("show");
+      showToast("Cancellation requested", "The migration cancellation request was submitted in this prototype.");
+    });
+
+    $("#cancelModal").addEventListener("click", (event) => {
+      if (event.target === $("#cancelModal")) {
+        $("#cancelModal").classList.remove("show");
+      }
+    });
+
+    // Progressive evidence drawer.
+    const evidenceButton = $("#evidenceButton");
+    const evidenceDrawer = $("#evidenceDrawer");
+    const evidenceBackdrop = $("#evidenceBackdrop");
+
+    function setEvidenceOpen(open) {
+      evidenceDrawer.classList.toggle("open", open);
+      evidenceBackdrop.classList.toggle("open", open);
+      evidenceButton.setAttribute("aria-expanded", String(open));
+      evidenceDrawer.setAttribute("aria-hidden", String(!open));
+      evidenceBackdrop.setAttribute("aria-hidden", String(!open));
+      document.body.classList.toggle("evidence-open", open);
+
+      if (open) {
+        $("#assistantPopover").classList.remove("open");
+        $("#assistantLauncher").setAttribute("aria-expanded", "false");
+
+        setTimeout(() => {
+          const stream = $("#logStream");
+          stream.scrollTop = stream.scrollHeight;
+          $("#closeEvidenceButton").focus();
+        }, 80);
+      } else {
+        evidenceButton.focus();
+      }
+    }
+
+    evidenceButton.addEventListener("click", () => {
+      setEvidenceOpen(!evidenceDrawer.classList.contains("open"));
+    });
+
+    $("#closeEvidenceButton").addEventListener("click", () => {
+      setEvidenceOpen(false);
+    });
+
+    evidenceBackdrop.addEventListener("click", () => {
+      setEvidenceOpen(false);
+    });
+
+    // Logs.
+    $("#latestLogButton").addEventListener("click", () => {
+      const stream = $("#logStream");
+      stream.scrollTop = stream.scrollHeight;
+    });
+
+    const liveLogs = [
+      ["18:37:58", "PENDING", "result_contract still waiting for backend-owned evidence"],
+      ["18:38:09", "PENDING", "final_report artifacts=8 waiting for backend-owned evidence"],
+      ["18:38:21", "DONE", "stream heartbeat acknowledged status=connected"]
+    ];
+
+    let liveLogIndex = 0;
+
+    function appendLog(time, status, message) {
+      const line = document.createElement("div");
+      line.className = "log-line";
+
+      const statusClass = status === "DONE"
+        ? "log-tag--done"
+        : status === "PENDING"
+          ? "log-tag--pending"
+          : "log-tag--running";
+
+      line.innerHTML = `
+        <div class="log-line__time">${time}</div>
+        <div><span class="log-tag ${statusClass}">${status}</span></div>
+        <div class="log-line__message"></div>
+      `;
+
+      line.querySelector(".log-line__message").textContent = message;
+
+      const stream = $("#logStream");
+      stream.appendChild(line);
+      stream.scrollTop = stream.scrollHeight;
+
+      const total = stream.querySelectorAll(".log-line").length;
+      $("#evidenceCount").textContent = String(total);
+      $("#drawerEventCount").textContent = `${total} events`;
+    }
+
+    setInterval(() => {
+      if (liveLogIndex >= liveLogs.length) return;
+      appendLog(...liveLogs[liveLogIndex]);
+      liveLogIndex += 1;
+    }, 2700);
+
+    // Tabs.
+    $$("#jobTabs .tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        $$("#jobTabs .tab").forEach((item) => item.classList.remove("active"));
+        $$(".tab-panel").forEach((panel) => panel.classList.remove("active"));
+
+        tab.classList.add("active");
+        $(`.tab-panel[data-panel="${tab.dataset.tab}"]`).classList.add("active");
+      });
+    });
+
+    // Dependency upload.
+    $("#chooseFileButton").addEventListener("click", () => {
+      $("#dependencyFile").click();
+    });
+
+    $("#dependencyFile").addEventListener("change", (event) => {
+      const file = event.target.files?.[0];
+      $("#selectedFileName").textContent = file ? file.name : "No file selected";
+    });
+
+    $("#changeDependenciesButton").addEventListener("click", () => {
+      showToast("Dependency comparison queued", "The target dependency comparison was triggered in this prototype.");
+    });
+
+    // Liquid assistant.
+    const launcher = $("#assistantLauncher");
+    const popover = $("#assistantPopover");
+
+    function setAssistantOpen(open) {
+      popover.classList.toggle("open", open);
+      launcher.setAttribute("aria-expanded", String(open));
+      if (open) {
+        setTimeout(() => $("#assistantInput").focus(), 120);
+      }
+    }
+
+    launcher.addEventListener("click", () => {
+      if (evidenceDrawer.classList.contains("open")) {
+        setEvidenceOpen(false);
+      }
+      setAssistantOpen(!popover.classList.contains("open"));
+    });
+
+    $("#closeAssistantButton").addEventListener("click", () => {
+      setAssistantOpen(false);
+    });
+
+    function addChatMessage(role, meta, text) {
+      const empty = $("#assistantEmpty");
+      if (empty) empty.remove();
+
+      const row = document.createElement("div");
+      row.className = `chat-message chat-message--${role}`;
+
+      const assistantIcon = `
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+          <path d="M7 17.5 4.5 20v-4.2A7.5 7.5 0 1 1 19.5 12 7.5 7.5 0 0 1 7 17.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+      `;
+
+      const userIcon = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+          <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-7 8a7 7 0 0 1 14 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+
+      row.innerHTML = `
+        <div class="chat-avatar" aria-hidden="true">${role === "assistant" ? assistantIcon : userIcon}</div>
+        <div class="chat-bubble">
+          <div class="chat-bubble__meta">${meta}</div>
+          <div class="chat-bubble__text"></div>
+        </div>
+      `;
+
+      row.querySelector(".chat-bubble__text").textContent = text;
+
+      const messages = $("#assistantMessages");
+      messages.appendChild(row);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function sendAssistantMessage() {
+      const input = $("#assistantInput");
+      const value = input.value.trim();
+
+      if (!value) return;
+
+      addChatMessage("user", "You · now", value);
+      input.value = "";
+
+      setTimeout(() => {
+        addChatMessage(
+          "assistant",
+          "Deterministic context",
+          "The route migration is complete. Analysis, planning, assessment, approval, transform, build, test validation, and stage report have passed. Tests were accepted with PASS_WITH_WARNINGS. Result Contract and Final Report remain pending; the Final Report phase currently exposes eight artifacts. The event stream is connected and no gate is open."
+        );
+      }, 320);
+    }
+
+    $("#assistantSendButton").addEventListener("click", sendAssistantMessage);
+
+    $("#assistantInput").addEventListener("keydown", (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        sendAssistantMessage();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+
+      if (evidenceDrawer.classList.contains("open")) {
+        setEvidenceOpen(false);
+        return;
+      }
+
+      if (popover.classList.contains("open")) {
+        setAssistantOpen(false);
+      }
+    });
+  </script>
+</body>
+</html>

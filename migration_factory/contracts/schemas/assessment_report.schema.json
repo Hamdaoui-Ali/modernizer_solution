@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "assessment_report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "agent",
+    "phase",
+    "status",
+    "profile",
+    "overall_risk",
+    "source_stack",
+    "target_stack",
+    "analysis",
+    "planning",
+    "openrewrite_dry_run",
+    "migration_units",
+    "blockers",
+    "warnings",
+    "copilot",
+    "approval_readiness",
+    "read_only_verification",
+    "next_recommended_phase",
+    "execution_claims",
+    "artifact_refs"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "agent": {"type": "string", "enum": ["assessment"]},
+    "phase": {"type": "string", "enum": ["assessment"]},
+    "status": {"type": "string", "enum": ["PASS", "FAIL", "WARNING", "SKIPPED"]},
+    "profile": {"type": ["string", "null"]},
+    "overall_risk": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "BLOCKED", "UNKNOWN"]
+    },
+    "source_stack": {"type": "object"},
+    "target_stack": {"type": "object"},
+    "analysis": {
+      "type": "object",
+      "required": ["status", "artifact_ref"],
+      "properties": {
+        "status": {"type": "string"},
+        "artifact_ref": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "planning": {
+      "type": "object",
+      "required": ["status", "validation_status", "executable", "artifact_ref"],
+      "properties": {
+        "status": {"type": "string"},
+        "validation_status": {"type": "string"},
+        "executable": {"type": "boolean"},
+        "artifact_ref": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "openrewrite_dry_run": {
+      "type": "object",
+      "required": ["status", "overall_impact", "counts", "artifact_ref"],
+      "properties": {
+        "status": {"type": "string"},
+        "overall_impact": {"type": "string"},
+        "counts": {"type": "object"},
+        "artifact_ref": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "migration_units": {
+      "type": "object",
+      "required": ["count", "units", "artifact_ref"],
+      "properties": {
+        "count": {"type": "integer", "minimum": 0},
+        "units": {"type": "array", "items": {"type": "object"}},
+        "artifact_ref": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "blockers": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "copilot": {
+      "type": "object",
+      "required": ["status", "artifact_ref"],
+      "properties": {
+        "status": {"type": "string"},
+        "artifact_ref": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "approval_readiness": {
+      "type": "object",
+      "required": ["status", "requires_human_approval", "recommended_decision", "artifact_ref"],
+      "properties": {
+        "status": {"type": "string", "enum": ["READY_FOR_REVIEW", "BLOCKED"]},
+        "requires_human_approval": {"type": "boolean"},
+        "recommended_decision": {"type": ["string", "null"]},
+        "artifact_ref": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "read_only_verification": {
+      "type": "object",
+      "required": ["status", "source_modified", "artifact_ref"],
+      "properties": {
+        "status": {"type": "string"},
+        "source_modified": {"type": ["boolean", "null"]},
+        "artifact_ref": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "next_recommended_phase": {
+      "type": "string",
+      "enum": ["human_approval", "resolve_assessment_blockers"]
+    },
+    "execution_claims": {
+      "type": "object",
+      "required": [
+        "transformation_executed",
+        "openrewrite_apply_executed",
+        "migrated_build_executed",
+        "migrated_tests_executed",
+        "final_migration_executed"
+      ],
+      "properties": {
+        "transformation_executed": {"type": "boolean", "const": false},
+        "openrewrite_apply_executed": {"type": "boolean", "const": false},
+        "migrated_build_executed": {"type": "boolean", "const": false},
+        "migrated_tests_executed": {"type": "boolean", "const": false},
+        "final_migration_executed": {"type": "boolean", "const": false}
+      },
+      "additionalProperties": false
+    },
+    "artifact_refs": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "minLength": 1}
+    }
+  },
+  "additionalProperties": true
+}

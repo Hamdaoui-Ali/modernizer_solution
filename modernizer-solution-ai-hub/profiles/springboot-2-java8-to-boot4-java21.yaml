@@ -1,0 +1,57 @@
+id: springboot-2-java8-to-boot4-java21
+schema: schemas/migration-profile.schema.json
+description: Direct sandbox-only migration from Spring Boot 2.x on Java 8 to Spring Boot 4.x on Java 21.
+strategy: direct_openrewrite_sandbox
+risk_level: high
+production_allowed: false
+requires_human_approval: true
+fallback_profile: springboot-2-to-3-5-to-4-java21
+source_jdk_home_env: JAVA8_HOME
+target_jdk_home_env: JAVA21_HOME
+source:
+  java:
+    allowed_versions:
+      - "8"
+  spring_boot:
+    allowed_version_prefixes:
+      - "2"
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "21"
+  spring_boot: "4.0.0"
+  spring_framework: "7.x"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: false
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: false
+openrewrite:
+  preview_allowed: true
+  apply_allowed: false
+  catalog_path: catalogs/openrewrite/springboot-4-java21-sandbox.yaml
+  analysis_preview_maven_args:
+    - -Denforcer.skip=true
+  apply_goal: runNoFork
+  apply_maven_args:
+    - -Denforcer.skip=true
+  post_apply_patches:
+    - type: maven_enforcer_java_version
+      target_range: "[21,)"
+    - type: security_authorize_http_requests
+    - type: batch_flat_file_item_reader_constructor
+    - type: pom_property
+      property: archunit.version
+      old_value: 0.23.1
+      new_value: 1.4.1
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml

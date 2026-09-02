@@ -1,0 +1,40 @@
+id: library-jakarta-java17-minimal
+kind: openrewrite-catalog
+verification_status: experimental-preview-only
+plugin:
+  group_id: org.openrewrite.maven
+  artifact_id: rewrite-maven-plugin
+  version: "6.40.0"
+recipe_artifacts:
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-migrate-java
+    version: "3.35.0"
+active_recipes:
+  - org.openrewrite.java.migrate.UpgradeBuildToJava17
+  - org.openrewrite.java.migrate.jakarta.JavaxAnnotationMigrationToJakartaAnnotation
+  - org.openrewrite.java.migrate.jakarta.JavaxXmlBindMigrationToJakartaXmlBind
+  - org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence
+  - org.openrewrite.java.migrate.jakarta.JavaxServletToJakartaServlet
+preview_goals:
+  - dryRun
+forbidden_apply_goals:
+  - run
+  - runNoFork
+  - rewrite:run
+  - rewrite:runNoFork
+defaults:
+  export_datatables: true
+  fail_on_dry_run_results: false
+dry_run_only: true
+rewrite_run_allowed: false
+code_modification_allowed: false
+manual_review_rules:
+  - Flag any generated patch that changes jakarta.servlet-api scope from provided to compile.
+  - Confirm no Spring Boot upgrade, JakartaEE10 composite, rewrite-spring artifact, broad Java modernization recipe, rewrite:run, or apply goal is introduced.
+notes:
+  - Shared Maven JAR library assessment only; not a runnable Spring Boot service migration profile.
+  - First execution must use read_only_assessment mode.
+  - No rewrite:run, no OpenRewrite apply, and no original source modification are allowed by this catalog.
+  - Target Spring Boot metadata remains 3.5.14, but this catalog intentionally excludes Spring Boot upgrade recipes.
+  - Preview-only. rewrite-migrate-java recipe artifact may be Moderne Source Available License; legal review required before production use.
+license_note: "Preview-only. rewrite-migrate-java recipe artifact may be Moderne Source Available License; legal review required before production use."

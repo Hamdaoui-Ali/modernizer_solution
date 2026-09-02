@@ -1,0 +1,40 @@
+enabled: true
+provider: github_copilot
+mode: documentation_only
+adapter: copilot_cli
+fallback_adapter: local_documentation_agent
+fallback_enabled: true
+trigger_phase: post_final_report
+cli:
+  enabled: false
+  command: copilot
+  timeout_seconds: 180
+  working_directory: run_dir
+  output_directory: final/copilot_docs
+outputs:
+  - final/copilot_docs/migration_overview.md
+  - final/copilot_docs/technical_changes.md
+  - final/copilot_docs/validation_evidence.md
+  - final/copilot_docs/risks_and_warnings.md
+  - final/copilot_docs/copilot_review.md
+required_inputs:
+  - analysis/analysis_report.json
+  - planning/migration_plan.yaml
+  - approval/approval_decision.json
+  - approval/approved_plan_lock.json
+  - transformation/transformation_execution_plan.yaml
+  - workspaces/sandbox/.migration/ledger.json
+  - test/post_transform/test_report.json
+  - orchestration/orchestration_summary.json
+  - final/migration_report.json
+forbidden_actions:
+  - source_writes
+  - sandbox_source_writes
+  - approval_changes
+  - plan_changes
+  - blocker_changes
+  - gate_changes
+  - promotion
+  - pull_request_creation
+  - deployment
+traceability_required: true

@@ -1,0 +1,29 @@
+﻿.venv/
+__pycache__/
+*.pyc
+.env
+.mf_runs/
+.codex/
+.codex-dev*.log
+.codex-dev.err.log
+.codex-dev.out.log
+*.log
+node_modules/
+.next/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.tmp-tests/
+migration_factory/contracts/build/build-error-*.json
+
+.migration/
+
+# Runtime DB and control-tower dev artifacts
+.control-tower-dev/
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Graphify local-only outputs (not shared graph artifacts)
+/graphify-out/

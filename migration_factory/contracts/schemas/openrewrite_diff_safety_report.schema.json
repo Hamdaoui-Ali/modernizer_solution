@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["schema_version", "run_id", "status", "risk_level", "changed_files", "deleted_files", "warnings", "requires_human_review"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "run_id": {"type": "string"},
+    "status": {"enum": ["LOW_RISK", "WARNING", "HIGH_RISK", "BLOCKED", "SKIPPED"]},
+    "risk_level": {"enum": ["LOW", "MEDIUM", "HIGH", "BLOCKED", "UNKNOWN"]},
+    "changed_files": {"type": "array", "items": {"type": "string"}},
+    "deleted_files": {"type": "array", "items": {"type": "string"}},
+    "pom_changes": {"type": "array"},
+    "source_changes": {"type": "array"},
+    "security_behavior_changes": {"type": "array"},
+    "business_logic_changes": {"type": "array"},
+    "high_risk_changes": {"type": "array"},
+    "warnings": {"type": "array"},
+    "recommended_next_step": {"type": "string"},
+    "copilot_repair_recommended": {"type": "boolean"},
+    "requires_human_review": {"type": "boolean"},
+    "artifact_refs": {"type": "object"}
+  },
+  "additionalProperties": true
+}

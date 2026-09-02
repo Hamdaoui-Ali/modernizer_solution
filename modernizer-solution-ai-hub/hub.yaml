@@ -1,0 +1,8 @@
+hub_version: 1
+default_profile: springboot-2.7-to-3.5-java17
+dirs:
+  profiles: profiles
+  catalogs: catalogs
+  policies: policies
+  schemas: schemas
+

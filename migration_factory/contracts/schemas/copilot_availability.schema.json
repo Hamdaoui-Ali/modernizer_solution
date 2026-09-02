@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["schema_version", "status", "provider", "supported_flags", "missing_required_flags", "agent_status", "skills_status", "dry_probe_status", "warnings", "errors"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "status": {"enum": ["AVAILABLE", "UNAVAILABLE", "SKIPPED"]},
+    "reason": {"type": "string"},
+    "provider": {"type": "string"},
+    "model": {"type": "string"},
+    "cli_path": {"type": "string"},
+    "cli_version": {"type": "string"},
+    "supported_flags": {"type": "array", "items": {"type": "string"}},
+    "missing_required_flags": {"type": "array", "items": {"type": "string"}},
+    "agent_status": {"enum": ["FOUND", "MISSING", "INVALID", "SKIPPED"]},
+    "skills_status": {"enum": ["FOUND", "MISSING", "INVALID", "SKIPPED"]},
+    "dry_probe_status": {"enum": ["PASSED", "FAILED", "SKIPPED"]},
+    "warnings": {"type": "array", "items": {"type": "string"}},
+    "errors": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

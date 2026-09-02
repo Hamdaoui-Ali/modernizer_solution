@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "test_report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "agent",
+    "run_id",
+    "phase",
+    "test_status",
+    "totals",
+    "command",
+    "cwd",
+    "sandbox_path",
+    "execution_owner",
+    "execution_mode",
+    "report_paths",
+    "test_log_path",
+    "source_log_path",
+    "created_at",
+    "artifact_refs"
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "agent": {"type": "string", "enum": ["test-agent"]},
+    "run_id": {"type": "string", "minLength": 1},
+    "phase": {"type": "string", "enum": ["post_transform"]},
+    "test_status": {"type": "string", "enum": ["TEST_PASSED", "TEST_FAILED", "TEST_ERROR", "PASS_WITH_WARNINGS", "TESTS_NOT_FOUND"]},
+    "build_status": {"type": ["string", "null"]},
+    "build_exit_code": {"type": ["integer", "null"]},
+    "totals": {
+      "type": "object",
+      "required": ["tests", "passed", "failures", "errors", "skipped"],
+      "properties": {
+        "tests": {"type": "integer", "minimum": 0},
+        "passed": {"type": "integer", "minimum": 0},
+        "failures": {"type": "integer", "minimum": 0},
+        "errors": {"type": "integer", "minimum": 0},
+        "skipped": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": false
+    },
+    "command": {"type": "array", "items": {"type": "string"}},
+    "cwd": {"type": ["string", "null"]},
+    "sandbox_path": {"type": "string", "minLength": 1},
+    "execution_owner": {"type": "string", "enum": ["build-agent"]},
+    "execution_mode": {"type": "string", "enum": ["parse_existing_surefire"]},
+    "report_paths": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "surefire_report_dir": {"type": "string", "minLength": 1},
+    "surefire_report_dir_exists": {"type": "boolean"},
+    "detected_test_sources": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "runnable_test_candidates": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "non_runnable_test_sources": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "reason": {"type": "string"},
+    "test_log_path": {"type": "string", "minLength": 1},
+    "source_log_path": {"type": "string", "minLength": 1},
+    "created_at": {"type": "string", "minLength": 1},
+    "artifact_refs": {
+      "type": "object",
+      "required": ["self", "summary", "log"],
+      "properties": {
+        "self": {"type": "string", "minLength": 1},
+        "summary": {"type": "string", "minLength": 1},
+        "log": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,14 @@
+jsonschema
+fastapi==0.136.3
+langgraph
+pydantic<3,>=2
+PyYAML
+sse-starlette==3.4.4
+uvicorn==0.38.0
+
+[test]
+jsonschema
+fastapi==0.136.3
+pydantic<3,>=2
+pytest
+sse-starlette==3.4.4

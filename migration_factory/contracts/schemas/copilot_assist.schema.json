@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "copilot_assist",
+  "oneOf": [
+    {"$ref": "#/definitions/legacy_assist"},
+    {"$ref": "#/definitions/phase_advisory_assist"}
+  ],
+  "properties": {
+    "schema_version": {"type": "string", "enum": ["1.0.0"]},
+    "status": {
+      "type": "string",
+      "enum": ["USED", "SKIPPED", "UNAVAILABLE", "ERROR", "generated", "skipped", "failed", "fallback"]
+    }
+  },
+  "definitions": {
+    "legacy_assist": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "run_id",
+        "agent",
+        "phase",
+        "status",
+        "provider",
+        "model",
+        "inputs_summary",
+        "advisory_summary",
+        "warnings",
+        "error",
+        "can_modify_source",
+        "can_modify_plan",
+        "can_modify_blockers",
+        "can_modify_executable",
+        "can_modify_unit_order",
+        "can_modify_approval_decision",
+        "can_modify_tools",
+        "artifact_refs"
+      ],
+      "properties": {
+        "schema_version": {"type": "string", "enum": ["1.0.0"]},
+        "run_id": {"type": "string", "minLength": 1},
+        "agent": {"type": "string", "enum": ["analysis_agent", "planning_agent"]},
+        "phase": {"type": "string", "enum": ["analysis", "planning"]},
+        "status": {
+          "type": "string",
+          "enum": ["USED", "SKIPPED", "UNAVAILABLE", "ERROR"]
+        },
+        "provider": {"type": ["string", "null"]},
+        "model": {"type": ["string", "null"]},
+        "inputs_summary": {"type": "object"},
+        "advisory_summary": {"type": "object"},
+        "warnings": {"type": "array", "items": {"type": "string"}},
+        "error": {"type": ["string", "null"]},
+        "can_modify_source": {"type": "boolean", "const": false},
+        "can_modify_plan": {"type": "boolean", "const": false},
+        "can_modify_blockers": {"type": "boolean", "const": false},
+        "can_modify_executable": {"type": "boolean", "const": false},
+        "can_modify_unit_order": {"type": "boolean", "const": false},
+        "can_modify_approval_decision": {"type": "boolean", "const": false},
+        "can_modify_tools": {"type": "boolean", "const": false},
+        "artifact_refs": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        }
+      },
+      "additionalProperties": true
+    },
+    "phase_advisory_assist": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "run_id",
+        "phase",
+        "agent",
+        "provider",
+        "model",
+        "status",
+        "advisory_only",
+        "trigger",
+        "validation_snapshot",
+        "root_cause_summary",
+        "evidence",
+        "recommended_actions",
+        "blocked_actions",
+        "confidence",
+        "fallback_used",
+        "created_at"
+      ],
+      "properties": {
+        "schema_version": {"type": "string", "enum": ["1.0.0"]},
+        "run_id": {"type": "string", "minLength": 1},
+        "phase": {
+          "type": "string",
+          "enum": ["analysis", "planning", "assessment", "transformation", "build", "quality", "security", "final"]
+        },
+        "agent": {"type": "string", "minLength": 1},
+        "provider": {"type": "string", "minLength": 1},
+        "model": {"type": ["string", "null"]},
+        "status": {"type": "string", "enum": ["generated", "skipped", "failed", "fallback"]},
+        "advisory_only": {"type": "boolean", "const": true},
+        "trigger": {"type": ["string", "object"]},
+        "validation_snapshot": {"type": "object"},
+        "root_cause_summary": {"type": ["string", "null"]},
+        "evidence": {
+          "type": "array",
+          "items": {"type": ["string", "object"]}
+        },
+        "recommended_actions": {
+          "type": "array",
+          "items": {"type": ["string", "object"]}
+        },
+        "blocked_actions": {
+          "type": "array",
+          "items": {"type": ["string", "object"]}
+        },
+        "confidence": {"type": "string", "enum": ["low", "medium", "high"]},
+        "fallback_used": {"type": "boolean"},
+        "created_at": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": true
+    }
+  }
+}

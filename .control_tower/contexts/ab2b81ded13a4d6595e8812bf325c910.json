@@ -1,0 +1,9 @@
+{
+  "command_id": "ab2b81ded13a4d6595e8812bf325c910",
+  "job_id": "c45852cb6754494eb0b10b31a4fb671c",
+  "route_step_index": 1,
+  "run_dir": "C:\\Users\\aliha\\Downloads\\Modern Java Shop\\.migration\\runs\\v2-c45852cb",
+  "runtime_profile": "springboot-2.7-to-3.5-java17",
+  "sandbox_path": "C:\\Users\\aliha\\Downloads\\Modern Java Shop",
+  "stage_index": 1
+}

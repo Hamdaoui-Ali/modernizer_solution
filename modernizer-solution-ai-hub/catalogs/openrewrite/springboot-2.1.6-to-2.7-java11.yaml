@@ -1,0 +1,27 @@
+id: springboot-2.1.6-to-2.7-java11
+kind: openrewrite-catalog
+verification_status: staged-profile
+plugin:
+  group_id: org.openrewrite.maven
+  artifact_id: rewrite-maven-plugin
+  version: "6.40.0"
+recipe_artifacts:
+  - group_id: org.openrewrite.recipe
+    artifact_id: rewrite-spring
+    version: "6.31.0"
+active_recipes:
+  - org.openrewrite.java.spring.boot2.UpgradeSpringBoot_2_7
+preview_goals:
+  - dryRun
+  - dryRunNoFork
+  - discover
+apply_goal: runNoFork
+apply_maven_args:
+  - -Drewrite.exportDatatables=true
+defaults:
+  export_datatables: true
+  fail_on_dry_run_results: false
+notes:
+  - Stage A intentionally keeps Java 11 and avoids Jakarta namespace migration.
+  - Human approval and sandbox isolation are required before apply.
+

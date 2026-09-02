@@ -1,0 +1,19 @@
+id: copilot_final_migration_report_v1
+version: 1.0.0
+type: final_migration_report
+engine: github_copilot
+template_file: copilot_final_migration_report_v1.md
+output_file: final/copilot_migration_report.md
+request_file: final/copilot_report_request.json
+response_file: final/copilot_report_response.json
+advisory_only: true
+requires:
+  - final/migration_report.json
+  - orchestration/orchestration_summary.json
+  - approval/approval_decision.json
+  - approval/approved_plan_lock.json
+  - test/post_transform/test_report.json
+optional:
+  - performance/timing_report.json
+  - workspaces/sandbox/.migration/ledger.json
+  - transformation/transformation_execution_plan.yaml

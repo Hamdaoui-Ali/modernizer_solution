@@ -1,0 +1,16 @@
+enabled: false
+provider: github_copilot
+mode: assist_only
+direct_write: false
+auth:
+  default_mode: github_signed_in_user
+  modes: [github_signed_in_user, oauth_github_app, token]
+  token_env_vars: [MF_PLANNING_ASSIST_TOKEN, AIMF_COPILOT_TOKEN, GITHUB_COPILOT_TOKEN, GITHUB_TOKEN, GH_TOKEN]
+model:
+  default: gpt-5-mini
+  allowed: [gpt-5-mini, gpt-4.1, gpt-4o, gpt-4o-mini]
+  phase_overrides:
+    analysis: gpt-5-mini
+    planning: gpt-5-mini
+allowed_phases: [analysis_review, planning_review]
+forbidden_actions: [source_writes, blocker_changes, executable_changes, approval_changes, tool_changes, unit_changes]

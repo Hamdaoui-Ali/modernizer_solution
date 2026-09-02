@@ -1,0 +1,9 @@
+ALTER TABLE v2_repair_proposals ADD COLUMN apply_status TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN rerun_status TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN rollback_status TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN validation_result_ref TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN next_gate_id TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN next_gate_status TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN remaining_attempts INTEGER;
+ALTER TABLE v2_repair_proposals ADD COLUMN completed_at TEXT;
+ALTER TABLE v2_repair_proposals ADD COLUMN reviewer_decision TEXT;

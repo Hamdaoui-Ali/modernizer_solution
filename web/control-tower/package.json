@@ -1,0 +1,29 @@
+{
+  "name": "@modernizer/control-tower-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "audit": "npm audit --audit-level=moderate",
+    "build": "next build",
+    "dev": "next dev --hostname 127.0.0.1",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "16.2.7",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3",
+    "vitest": "4.1.8"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
+}

@@ -1,0 +1,50 @@
+id: springboot-3.5-java21-to-4.0-java21
+schema: schemas/migration-profile.schema.json
+description: >
+  Migrates Spring Boot 3.5.x (Java 21) applications to Spring Boot 4.x
+  (Java 21) using OpenRewrite. Sandbox transform only. High risk.
+  Human approval required.
+stage: D
+stage_name: springboot-3.5-java21-to-4.0-java21
+stage_order: 4
+purpose: Apply Spring Boot 4 upgrade recipes in a sandbox after the Java 21 runtime validation is green.
+strategy: staged_openrewrite_sandbox
+risk_level: high
+production_allowed: false
+sandbox_transform_allowed: true
+source_jdk_home_env: JAVA21_HOME
+target_jdk_home_env: JAVA21_HOME
+source:
+  java:
+    allowed_versions:
+      - "21"
+  spring_boot:
+    allowed_version_prefixes:
+      - "3.5"
+  build:
+    allowed_tools:
+      - maven
+target:
+  java: "21"
+  spring_boot: "4.0.0"
+  spring_framework: "7.0.0"
+  build: maven
+requirements:
+  human_approval_required: true
+  baseline_tests_required: true
+  dependency_graph_unavailable_fatal: false
+rules:
+  human_approval_required: true
+  baseline_tests_required: true
+  dependency_graph_unavailable_fatal: false
+  openrewrite_preview_allowed: true
+  openrewrite_apply_allowed: true
+openrewrite:
+  preview_allowed: true
+  apply_allowed: true
+  catalog_path: catalogs/openrewrite/springboot-3.5-java21-to-4.0-java21.yaml
+  apply_goal: runNoFork
+policies:
+  safety: policies/safety.yaml
+  planning: policies/planning.yaml
+  transformation: policies/transformation.yaml

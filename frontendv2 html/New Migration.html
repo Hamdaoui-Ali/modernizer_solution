@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Migration · Migration Factory</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-subtle: #fafbfc;
+      --surface-muted: #f1f3f6;
+      --text: #172033;
+      --text-strong: #0f1728;
+      --muted: #667085;
+      --muted-2: #8a94a6;
+      --border: #dfe3e8;
+      --border-strong: #c9d0d9;
+      --accent: #3157d5;
+      --accent-hover: #2647b5;
+      --accent-soft: #edf1ff;
+      --accent-line: #becaf5;
+      --success: #18794e;
+      --success-soft: #eaf7f0;
+      --warning: #9a5b00;
+      --warning-soft: #fff6e2;
+      --danger: #c2382f;
+      --danger-soft: #fff0ee;
+      --shadow: 0 1px 2px rgba(16, 24, 40, .04), 0 8px 24px rgba(16, 24, 40, .045);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --max: 1280px;
+      --focus: 0 0 0 3px rgba(49, 87, 213, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      text-rendering: optimizeLegibility;
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .52; }
+    svg { display: block; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: 58px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(14px);
+    }
+
+    .topbar__inner {
+      width: min(var(--max), calc(100% - 40px));
+      height: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-strong);
+      font-size: 14px;
+      font-weight: 730;
+      letter-spacing: -.01em;
+    }
+
+    .brand__mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      border-radius: 7px;
+      background: var(--accent);
+    }
+
+    .backend-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 620;
+    }
+
+    .backend-status__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 3px var(--success-soft);
+    }
+
+    .page {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 28px 0 72px;
+    }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 620;
+    }
+
+    .breadcrumbs span:last-child { color: var(--text); }
+
+    .page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 22px;
+    }
+
+    .page-head h1 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 30px;
+      line-height: 1.15;
+      letter-spacing: -.035em;
+    }
+
+    .page-head p {
+      max-width: 670px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .page-head__actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex: none;
+    }
+
+    .btn {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-size: 11.5px;
+      font-weight: 720;
+      transition: background .14s ease, border-color .14s ease, color .14s ease, transform .08s ease;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: #adb7c3;
+      background: var(--surface-subtle);
+    }
+
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:focus-visible { outline: none; box-shadow: var(--focus); }
+
+    .btn--primary {
+      color: #fff;
+      border-color: var(--accent);
+      background: var(--accent);
+    }
+
+    .btn--primary:hover:not(:disabled) {
+      border-color: var(--accent-hover);
+      background: var(--accent-hover);
+    }
+
+    .btn--soft {
+      color: var(--accent);
+      border-color: var(--accent-line);
+      background: var(--accent-soft);
+    }
+
+    .btn--soft:hover:not(:disabled) {
+      border-color: #aab9ee;
+      background: #e4eaff;
+    }
+
+    .btn--large {
+      min-height: 44px;
+      padding: 0 16px;
+      font-size: 12.5px;
+    }
+
+    .btn--block { width: 100%; }
+
+    .route-board {
+      margin-bottom: 22px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .route-board__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .route-board__head strong {
+      color: var(--text-strong);
+      font-size: 12px;
+      font-weight: 760;
+    }
+
+    .route-board__head span {
+      color: var(--muted);
+      font-size: 10.5px;
+    }
+
+    .route-flow {
+      display: grid;
+      grid-template-columns: minmax(142px, 1.3fr) repeat(4, minmax(64px, .55fr)) minmax(142px, 1.3fr);
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    .route-node {
+      position: relative;
+      min-height: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-subtle);
+    }
+
+    .route-node:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      top: 50%;
+      right: -9px;
+      z-index: 3;
+      width: 18px;
+      height: 18px;
+      display: grid;
+      place-items: center;
+      color: var(--muted-2);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--surface);
+      transform: translate(50%, -50%);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .route-node--edge {
+      border-color: var(--accent-line);
+      background: var(--accent-soft);
+    }
+
+    .route-node small {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    .route-node strong {
+      color: var(--text-strong);
+      font-size: 11.5px;
+      line-height: 1.35;
+    }
+
+    .route-node span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .route-node--stage {
+      align-items: center;
+      text-align: center;
+    }
+
+    .route-node--stage strong {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      border: 1px solid var(--accent-line);
+      border-radius: 50%;
+      background: var(--surface);
+      font-size: 10px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 344px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .main-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .card__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 17px 18px 15px;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .card__head h2 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 14px;
+      font-weight: 750;
+      letter-spacing: -.015em;
+    }
+
+    .card__head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .card__body { padding: 18px; }
+
+    details.import-box {
+      margin-bottom: 17px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface-subtle);
+    }
+
+    details.import-box[open] { background: var(--surface); }
+
+    .import-box summary {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 13px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+    }
+
+    .import-box summary::-webkit-details-marker { display: none; }
+
+    .import-box__copy {
+      min-width: 0;
+    }
+
+    .import-box__copy strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 11.5px;
+    }
+
+    .import-box__copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.4;
+    }
+
+    .import-box__chevron {
+      color: var(--muted);
+      transition: transform .15s ease;
+    }
+
+    details[open] .import-box__chevron { transform: rotate(180deg); }
+
+    .import-box__content {
+      padding: 0 13px 13px;
+      border-top: 1px solid #edf0f3;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 148px;
+      margin-top: 13px;
+      padding: 12px 13px;
+      resize: vertical;
+      color: #e9eef8;
+      border: 1px solid #27344a;
+      border-radius: 8px;
+      outline: none;
+      background: #111827;
+      font-family: "Cascadia Code", Consolas, "Liberation Mono", monospace;
+      font-size: 10.5px;
+      line-height: 1.55;
+      tab-size: 2;
+    }
+
+    textarea:focus { box-shadow: 0 0 0 3px rgba(49, 87, 213, .2); }
+
+    .parse-message {
+      display: none;
+      margin-top: 10px;
+      padding: 9px 10px;
+      color: #34476c;
+      border: 1px solid var(--accent-line);
+      border-radius: 8px;
+      background: var(--accent-soft);
+      font-size: 10.5px;
+      line-height: 1.45;
+    }
+
+    .parse-message.is-visible { display: block; }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 15px 16px;
+    }
+
+    .field { min-width: 0; }
+    .field--full { grid-column: 1 / -1; }
+
+    .field__label {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .field label {
+      color: var(--text);
+      font-size: 11.5px;
+      font-weight: 690;
+    }
+
+    .required { color: var(--danger); }
+
+    .hint {
+      color: var(--muted-2);
+      font-size: 9.8px;
+      line-height: 1.35;
+    }
+
+    input, select {
+      width: 100%;
+      height: 40px;
+      padding: 0 11px;
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      outline: none;
+      background: var(--surface);
+      font-size: 11.5px;
+      transition: border-color .14s ease, box-shadow .14s ease;
+    }
+
+    input:hover, select:hover { border-color: #acb6c2; }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: var(--focus);
+    }
+
+    .path-field { position: relative; }
+    .path-field input { padding-right: 36px; }
+
+    .path-field__icon {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      color: var(--muted-2);
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .checkbox {
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--text);
+      font-size: 11.5px;
+    }
+
+    .checkbox input {
+      width: 15px;
+      height: 15px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .section-divider {
+      height: 1px;
+      margin: 18px 0;
+      background: #edf0f3;
+    }
+
+    .subheading {
+      margin: 0 0 11px;
+      color: var(--text-strong);
+      font-size: 11.5px;
+      font-weight: 750;
+    }
+
+    .route-details {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 13px;
+    }
+
+    .route-detail {
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-subtle);
+    }
+
+    .route-detail small {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 760;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .route-detail strong {
+      color: var(--text);
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 10px;
+      font-weight: 650;
+    }
+
+    .azure-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-subtle);
+    }
+
+    .azure-row__copy strong {
+      display: block;
+      color: var(--text-strong);
+      font-size: 11.5px;
+    }
+
+    .azure-row__copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10.5px;
+    }
+
+    .state {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 750;
+    }
+
+    .state::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .state--pass { color: var(--success); }
+    .state--warn { color: var(--warning); }
+
+    .preflight-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 16px 0 13px;
+    }
+
+    .preflight-toolbar p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 10.8px;
+      line-height: 1.45;
+    }
+
+    .check-groups {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .check-group {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface-subtle);
+    }
+
+    .check-group__title {
+      padding: 9px 10px;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-muted);
+      font-size: 9.5px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    .check-list { display: grid; }
+
+    .check-item {
+      min-height: 36px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      color: var(--text);
+      border-bottom: 1px solid #edf0f3;
+      background: var(--surface);
+      font-size: 10.5px;
+    }
+
+    .check-item:last-child { border-bottom: 0; }
+
+    .check-item__icon {
+      width: 18px;
+      height: 18px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--muted-2);
+      border-radius: 50%;
+      background: var(--surface-muted);
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .check-item.is-running .check-item__icon {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .check-item.is-pass .check-item__icon {
+      color: var(--success);
+      background: var(--success-soft);
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .review-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .review-card__head {
+      padding: 16px 17px 13px;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .review-card__head h2 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .review-card__head p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.4;
+    }
+
+    .review-card__body { padding: 15px 17px 17px; }
+
+    .summary-list {
+      display: grid;
+      margin: 0;
+    }
+
+    .summary-row {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr);
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #edf0f3;
+    }
+
+    .summary-row:first-child { padding-top: 0; }
+    .summary-row:last-child { border-bottom: 0; }
+
+    .summary-row dt {
+      color: var(--muted);
+      font-size: 10.5px;
+    }
+
+    .summary-row dd {
+      margin: 0;
+      color: var(--text);
+      font-size: 10.5px;
+      font-weight: 680;
+      line-height: 1.4;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    .readiness-list {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .readiness-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 10.8px;
+    }
+
+    .readiness-row span:first-child { color: var(--muted); }
+
+    .readiness-row strong {
+      color: var(--text);
+      font-size: 10px;
+      text-align: right;
+    }
+
+    .readiness-row strong.is-pass { color: var(--success); }
+    .readiness-row strong.is-warn { color: var(--warning); }
+
+    .ready-banner {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 13px;
+      padding: 10px 11px;
+      color: var(--warning);
+      border: 1px solid #f0dca8;
+      border-radius: 8px;
+      background: var(--warning-soft);
+      font-size: 10.5px;
+      font-weight: 720;
+    }
+
+    .ready-banner.is-ready {
+      color: var(--success);
+      border-color: #bfe3d1;
+      background: var(--success-soft);
+    }
+
+    .ready-banner__icon {
+      width: 19px;
+      height: 19px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.65);
+      font-size: 9px;
+      font-weight: 900;
+    }
+
+    .start-note {
+      margin: 10px 0 0;
+      color: var(--muted-2);
+      font-size: 9.8px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 100;
+      width: min(348px, calc(100vw - 28px));
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      box-shadow: 0 16px 48px rgba(16,24,40,.16);
+      opacity: 0;
+      transform: translateY(120%);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .toast.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast__icon {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      color: var(--success);
+      border-radius: 50%;
+      background: var(--success-soft);
+      font-size: 10px;
+      font-weight: 900;
+    }
+
+    .toast strong {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text-strong);
+      font-size: 11.5px;
+    }
+
+    .toast p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.4;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: none;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15,23,40,.52);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-backdrop.is-visible { display: grid; }
+
+    .modal {
+      width: min(440px, 100%);
+      padding: 24px;
+      border-radius: 14px;
+      background: var(--surface);
+      box-shadow: 0 28px 90px rgba(16,24,40,.3);
+      text-align: center;
+    }
+
+    .modal__icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      color: var(--success);
+      border-radius: 50%;
+      background: var(--success-soft);
+    }
+
+    .modal h2 {
+      margin: 0;
+      color: var(--text-strong);
+      font-size: 20px;
+      letter-spacing: -.02em;
+    }
+
+    .modal p {
+      max-width: 360px;
+      margin: 9px auto 16px;
+      color: var(--muted);
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+
+    .job-id {
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px dashed var(--border-strong);
+      border-radius: 8px;
+      background: var(--surface-subtle);
+      font-family: "Cascadia Code", Consolas, monospace;
+      font-size: 10.5px;
+    }
+
+    .spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid #c8d1ee;
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1050px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar {
+        position: static;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .route-flow {
+        grid-template-columns: repeat(6, minmax(92px, 1fr));
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+      .route-node { min-width: 92px; }
+    }
+
+    @media (max-width: 720px) {
+      .topbar__inner, .page { width: min(var(--max), calc(100% - 24px)); }
+      .backend-status { display: none; }
+      .page-head {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .page-head__actions { justify-content: flex-end; }
+      .field-grid, .check-groups, .sidebar { grid-template-columns: 1fr; }
+      .route-details { grid-template-columns: 1fr; }
+      .azure-row, .preflight-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .azure-row .btn, .preflight-toolbar .btn { width: 100%; }
+    }
+
+    @media (max-width: 460px) {
+      .page { padding-top: 22px; }
+      .page-head h1 { font-size: 26px; }
+      .page-head__actions { display: grid; grid-template-columns: 1fr; }
+      .page-head__actions .btn { width: 100%; }
+      .card__head, .card__body { padding-left: 14px; padding-right: 14px; }
+      .summary-row { grid-template-columns: 86px minmax(0, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+            <path d="M5 7h9M5 12h14M10 17h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="m15 4 4 3-4 3M9 14l-4 3 4 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Migration Factory
+      </div>
+
+      <div class="backend-status">
+        <span class="backend-status__dot"></span>
+        Local backend connected
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <span>Migrations</span>
+      <span>›</span>
+      <span>New migration</span>
+    </nav>
+
+    <header class="page-head">
+      <div>
+        <h1>Create a local migration</h1>
+        <p>Check the source application, local toolchains, and migration route before the backend creates the migration workspace.</p>
+      </div>
+
+      <div class="page-head__actions">
+        <button class="btn" id="saveButton" type="button">Save setup</button>
+      </div>
+    </header>
+
+    <section class="route-board" aria-labelledby="routeBoardTitle">
+      <div class="route-board__head">
+        <strong id="routeBoardTitle">Migration route</strong>
+        <span>Included stages: 1, 2, 3, 4 · Skipped: none · Excluded: none</span>
+      </div>
+
+      <div class="route-flow" aria-label="Spring Boot 2.1 Java 11 to Spring Boot 4.0 Java 21 through stages 1 to 4">
+        <div class="route-node route-node--edge">
+          <small>Source</small>
+          <strong>Spring Boot 2.1</strong>
+          <span>Java 11</span>
+        </div>
+
+        <div class="route-node route-node--stage">
+          <small>Stage</small>
+          <strong>1</strong>
+        </div>
+
+        <div class="route-node route-node--stage">
+          <small>Stage</small>
+          <strong>2</strong>
+        </div>
+
+        <div class="route-node route-node--stage">
+          <small>Stage</small>
+          <strong>3</strong>
+        </div>
+
+        <div class="route-node route-node--stage">
+          <small>Stage</small>
+          <strong>4</strong>
+        </div>
+
+        <div class="route-node route-node--edge">
+          <small>Target</small>
+          <strong>Spring Boot 4.0</strong>
+          <span>Java 21</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="main-stack">
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <h2>Project and paths</h2>
+              <p>Name the run and locate the source, output, and AI Hub folders.</p>
+            </div>
+            <span class="hint">Required fields are marked *</span>
+          </div>
+
+          <div class="card__body">
+            <details class="import-box">
+              <summary>
+                <span class="import-box__copy">
+                  <strong>Import environment values</strong>
+                  <span>Paste the PowerShell block you already use. Supported variables fill the matching fields.</span>
+                </span>
+                <span class="import-box__chevron" aria-hidden="true">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
+                    <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </summary>
+
+              <div class="import-box__content">
+                <textarea id="envBlock" spellcheck="false" aria-label="PowerShell environment block">$env:MIGRATION_RUN_NAME = "msa-translation-v2-uat"
+$env:LEGACY_APP_PATH = "C:\Projects\msa-dto"
+$env:OUTPUT_PARENT_PATH = "C:\MigrationFactory\runs"
+$env:AI_HUB_PATH = "C:\MigrationFactory\ai-hub"
+$env:JAVA11_HOME = "C:\jdks\temurin-11"
+$env:JAVA17_HOME = "C:\jdks\temurin-17"
+$env:JAVA21_HOME = "C:\jdks\temurin-21"
+$env:MAVEN_COMMAND = "C:\tools\apache-maven-3.9.15\bin\mvn.cmd"</textarea>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+                  <button class="btn btn--soft" id="parseButton" type="button">Apply values</button>
+                  <button class="btn" id="clearButton" type="button">Clear</button>
+                </div>
+
+                <div class="parse-message" id="parseMessage" aria-live="polite"></div>
+              </div>
+            </details>
+
+            <div class="field-grid">
+              <div class="field field--full">
+                <div class="field__label">
+                  <label for="runName">Run name <span class="required">*</span></label>
+                  <span class="hint">Used for the workspace and migration records</span>
+                </div>
+                <input id="runName" value="msa-translation-v2-uat" autocomplete="off" />
+              </div>
+
+              <div class="field field--full">
+                <div class="field__label">
+                  <label for="legacyPath">Legacy app path <span class="required">*</span></label>
+                  <span class="hint">The source application is not modified</span>
+                </div>
+                <div class="path-field">
+                  <input id="legacyPath" value="C:\Projects\msa-dto" />
+                  <span class="path-field__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 8a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.7"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field__label">
+                  <label for="outputPath">Output parent path <span class="required">*</span></label>
+                </div>
+                <div class="path-field">
+                  <input id="outputPath" value="C:\MigrationFactory\runs" />
+                  <span class="path-field__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 8a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.7"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field__label">
+                  <label for="aiHubPath">AI Hub path <span class="required">*</span></label>
+                </div>
+                <div class="path-field">
+                  <input id="aiHubPath" value="C:\MigrationFactory\ai-hub" />
+                  <span class="path-field__icon" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <path d="M4 8a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.7"/>
+                    </svg>
+                  </span>
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="field__label">
+                  <label for="proofLevel">Proof level</label>
+                </div>
+                <select id="proofLevel">
+                  <option>Build & Test Verified</option>
+                  <option>Build Verified</option>
+                  <option>Static Validation Only</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <div class="field__label">
+                  <label>Endpoint smoke test</label>
+                </div>
+                <label class="checkbox">
+                  <input id="skipSmoke" type="checkbox" />
+                  <span>Skip endpoint smoke test</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <h2>Java and Maven</h2>
+              <p>Set the local executables used by the migration stages.</p>
+            </div>
+          </div>
+
+          <div class="card__body">
+            <div class="field-grid">
+              <div class="field">
+                <div class="field__label"><label for="java11">JAVA11_HOME <span class="required">*</span></label></div>
+                <input id="java11" value="C:\jdks\temurin-11" />
+              </div>
+
+              <div class="field">
+                <div class="field__label"><label for="java17">JAVA17_HOME <span class="required">*</span></label></div>
+                <input id="java17" value="C:\jdks\temurin-17" />
+              </div>
+
+              <div class="field">
+                <div class="field__label"><label for="java21">JAVA21_HOME <span class="required">*</span></label></div>
+                <input id="java21" value="C:\jdks\temurin-21" />
+              </div>
+
+              <div class="field">
+                <div class="field__label"><label for="mavenCommand">Maven command <span class="required">*</span></label></div>
+                <input id="mavenCommand" value="C:\tools\apache-maven-3.9.15\bin\mvn.cmd" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <h2>Source and target</h2>
+              <p>Choose the migration profiles and confirm the calculated route.</p>
+            </div>
+          </div>
+
+          <div class="card__body">
+            <div class="field-grid">
+              <div class="field">
+                <div class="field__label"><label for="sourceProfile">Source profile</label></div>
+                <select id="sourceProfile">
+                  <option>Spring Boot 2.1 / Java 11</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <div class="field__label"><label for="targetProfile">Target profile</label></div>
+                <select id="targetProfile">
+                  <option>Spring Boot 4.0 / Java 21</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="route-details">
+              <div class="route-detail">
+                <small>Included stages</small>
+                <strong>1, 2, 3, 4</strong>
+              </div>
+              <div class="route-detail">
+                <small>Skipped stages</small>
+                <strong>none</strong>
+              </div>
+              <div class="route-detail">
+                <small>Excluded stages</small>
+                <strong>none</strong>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card__head">
+            <div>
+              <h2>Azure and preflight</h2>
+              <p>Confirm the configured model, then validate the local migration prerequisites.</p>
+            </div>
+          </div>
+
+          <div class="card__body">
+            <div class="azure-row">
+              <div class="azure-row__copy">
+                <strong>Azure settings</strong>
+                <span>Endpoint configured. Run the check to confirm the current model configuration.</span>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+                <span class="state state--warn" id="azureState">Not checked</span>
+                <button class="btn" id="azureButton" type="button">Check Azure settings</button>
+              </div>
+            </div>
+
+            <div class="preflight-toolbar">
+              <p id="preflightMessage">Run preflight after the Azure settings check passes.</p>
+              <button class="btn btn--primary" id="preflightButton" type="button" disabled>Run preflight</button>
+            </div>
+
+            <div class="check-groups" id="checkGroups">
+              <section class="check-group">
+                <div class="check-group__title">Project paths</div>
+                <div class="check-list">
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Legacy app exists</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Legacy app has project file</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Legacy app is not in output parent</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Output parent is writable</span></div>
+                </div>
+              </section>
+
+              <section class="check-group">
+                <div class="check-group__title">AI Hub</div>
+                <div class="check-list">
+                  <div class="check-item"><span class="check-item__icon">•</span><span>AI Hub root exists</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>AI Hub profiles ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>AI Hub catalogs ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>AI Hub policies ready</span></div>
+                </div>
+              </section>
+
+              <section class="check-group">
+                <div class="check-group__title">Toolchains</div>
+                <div class="check-list">
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Java 11 ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Java 17 ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Java 21 ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Maven ready</span></div>
+                </div>
+              </section>
+
+              <section class="check-group">
+                <div class="check-group__title">Migration</div>
+                <div class="check-list">
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Pipeline route ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Legacy marker ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Output parent gate ready</span></div>
+                  <div class="check-item"><span class="check-item__icon">•</span><span>Azure model ready</span></div>
+                </div>
+              </section>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="sidebar">
+        <section class="review-card">
+          <div class="review-card__head">
+            <h2>Review</h2>
+            <p>Current values used when the migration starts.</p>
+          </div>
+
+          <div class="review-card__body">
+            <dl class="summary-list">
+              <div class="summary-row">
+                <dt>Run</dt>
+                <dd id="summaryRun">msa-translation-v2-uat</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Source</dt>
+                <dd>Spring Boot 2.1 / Java 11</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Target</dt>
+                <dd>Spring Boot 4.0 / Java 21</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Proof</dt>
+                <dd id="summaryProof">Build & Test Verified</dd>
+              </div>
+              <div class="summary-row">
+                <dt>Output</dt>
+                <dd id="summaryOutput">C:\MigrationFactory\runs</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="review-card">
+          <div class="review-card__head">
+            <h2>Ready to start</h2>
+            <p>Complete each check before creating the migration workspace.</p>
+          </div>
+
+          <div class="review-card__body">
+            <div class="ready-banner" id="readyBanner">
+              <span class="ready-banner__icon" id="readyIcon">!</span>
+              <span id="readyText">Validation required</span>
+            </div>
+
+            <div class="readiness-list">
+              <div class="readiness-row">
+                <span>Required fields</span>
+                <strong id="fieldsStatus" class="is-pass">Complete</strong>
+              </div>
+              <div class="readiness-row">
+                <span>Azure settings</span>
+                <strong id="azureStatus" class="is-warn">Not checked</strong>
+              </div>
+              <div class="readiness-row">
+                <span>Preflight</span>
+                <strong id="preflightStatus" class="is-warn">Not run</strong>
+              </div>
+              <div class="readiness-row">
+                <span>Checksum</span>
+                <strong id="checksumStatus" class="is-warn">Pending</strong>
+              </div>
+            </div>
+
+            <button class="btn btn--primary btn--large btn--block" id="startButton" type="button" disabled>Start migration</button>
+            <p class="start-note">Starting creates a new migration workspace. The legacy application remains unchanged.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <div class="toast__icon">✓</div>
+    <div>
+      <strong id="toastTitle">Saved</strong>
+      <p id="toastMessage">The setup was saved.</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal">
+      <div class="modal__icon">
+        <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
+          <path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 id="modalTitle">Migration started</h2>
+      <p>The prototype passed its simulated checks. Connect this action to the existing start-migration request in the real screen.</p>
+      <div class="job-id" id="jobId">v2-demo-00000000</div>
+      <button class="btn btn--primary btn--large btn--block" id="closeModalButton" type="button">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+    const state = {
+      azureReady: false,
+      preflightReady: false,
+      busy: false
+    };
+
+    const requiredFields = [
+      "runName",
+      "legacyPath",
+      "outputPath",
+      "aiHubPath",
+      "java11",
+      "java17",
+      "java21",
+      "mavenCommand"
+    ];
+
+    function hasAllFields() {
+      return requiredFields.every(id => $("#" + id).value.trim().length > 0);
+    }
+
+    function updateSummary() {
+      $("#summaryRun").textContent = $("#runName").value.trim() || "Not set";
+      $("#summaryOutput").textContent = $("#outputPath").value.trim() || "Not set";
+      $("#summaryProof").textContent = $("#proofLevel").value;
+
+      const complete = hasAllFields();
+      $("#fieldsStatus").textContent = complete ? "Complete" : "Missing fields";
+      $("#fieldsStatus").className = complete ? "is-pass" : "is-warn";
+
+      updateReadiness();
+    }
+
+    function updateReadiness() {
+      const ready = hasAllFields() && state.azureReady && state.preflightReady;
+
+      $("#startButton").disabled = !ready;
+      $("#readyBanner").classList.toggle("is-ready", ready);
+      $("#readyIcon").textContent = ready ? "✓" : "!";
+      $("#readyText").textContent = ready ? "Ready to start" : "Validation required";
+    }
+
+    function resetChecks() {
+      state.azureReady = false;
+      state.preflightReady = false;
+
+      $("#azureState").className = "state state--warn";
+      $("#azureState").textContent = "Not checked";
+      $("#azureStatus").textContent = "Not checked";
+      $("#azureStatus").className = "is-warn";
+      $("#preflightStatus").textContent = "Not run";
+      $("#preflightStatus").className = "is-warn";
+      $("#checksumStatus").textContent = "Pending";
+      $("#checksumStatus").className = "is-warn";
+      $("#preflightMessage").textContent = "Run preflight after the Azure settings check passes.";
+      $("#preflightButton").disabled = true;
+      $("#preflightButton").className = "btn btn--primary";
+
+      $$("#checkGroups .check-item").forEach(item => {
+        item.className = "check-item";
+        item.querySelector(".check-item__icon").textContent = "•";
+      });
+
+      updateReadiness();
+    }
+
+    function showToast(title, message) {
+      $("#toastTitle").textContent = title;
+      $("#toastMessage").textContent = message;
+      $("#toast").classList.add("is-visible");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => $("#toast").classList.remove("is-visible"), 3000);
+    }
+
+    function parseEnvironment() {
+      const mapping = {
+        MIGRATION_RUN_NAME: "runName",
+        LEGACY_APP_PATH: "legacyPath",
+        OUTPUT_PARENT_PATH: "outputPath",
+        AI_HUB_PATH: "aiHubPath",
+        JAVA11_HOME: "java11",
+        JAVA17_HOME: "java17",
+        JAVA21_HOME: "java21",
+        MAVEN_COMMAND: "mavenCommand"
+      };
+
+      const regex = /\$env:([A-Za-z0-9_]+)\s*=\s*["']([^"']*)["']/g;
+      const source = $("#envBlock").value;
+      const applied = [];
+      const ignored = [];
+      let match;
+
+      while ((match = regex.exec(source)) !== null) {
+        const key = match[1].toUpperCase();
+        if (mapping[key]) {
+          $("#" + mapping[key]).value = match[2];
+          applied.push(key);
+        } else {
+          ignored.push(key);
+        }
+      }
+
+      const message = $("#parseMessage");
+      message.classList.add("is-visible");
+
+      if (!applied.length) {
+        message.innerHTML = "<strong>No supported variables found.</strong> Check the PowerShell variable names and try again.";
+        return;
+      }
+
+      message.innerHTML =
+        `<strong>${applied.length} values applied.</strong> ${applied.join(", ")}` +
+        (ignored.length ? `<br><span style="color:var(--muted)">Ignored: ${ignored.join(", ")}</span>` : "");
+
+      updateSummary();
+      resetChecks();
+      showToast("Environment values applied", `${applied.length} fields were updated.`);
+    }
+
+    async function checkAzure() {
+      if (state.busy) return;
+      state.busy = true;
+
+      const button = $("#azureButton");
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> Checking';
+
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      state.azureReady = true;
+      state.preflightReady = false;
+      state.busy = false;
+
+      button.disabled = false;
+      button.textContent = "Check again";
+
+      $("#azureState").className = "state state--pass";
+      $("#azureState").textContent = "PASS";
+      $("#azureStatus").textContent = "PASS";
+      $("#azureStatus").className = "is-pass";
+      $("#preflightButton").disabled = false;
+      $("#preflightMessage").textContent = "Azure is ready. Run the local preflight checks.";
+
+      updateReadiness();
+      showToast("Azure settings passed", "The simulated Azure model check completed.");
+    }
+
+    async function runPreflight() {
+      if (state.busy || !state.azureReady) return;
+      state.busy = true;
+      state.preflightReady = false;
+
+      const button = $("#preflightButton");
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner"></span> Running';
+      $("#preflightMessage").textContent = "Checking local paths, toolchains, route, and model readiness.";
+
+      const items = $$("#checkGroups .check-item");
+
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        const icon = item.querySelector(".check-item__icon");
+
+        item.className = "check-item is-running";
+        icon.innerHTML = '<span class="spinner"></span>';
+
+        await new Promise(resolve => setTimeout(resolve, 105));
+
+        item.className = "check-item is-pass";
+        icon.textContent = "✓";
+        $("#preflightStatus").textContent = `${index + 1} / ${items.length}`;
+      }
+
+      state.preflightReady = true;
+      state.busy = false;
+
+      button.disabled = false;
+      button.textContent = "Run again";
+      button.className = "btn";
+      $("#preflightMessage").textContent = "All preflight checks passed.";
+      $("#preflightStatus").textContent = "All ready";
+      $("#preflightStatus").className = "is-pass";
+      $("#checksumStatus").textContent = "Matched";
+      $("#checksumStatus").className = "is-pass";
+
+      updateReadiness();
+      showToast("Preflight passed", "All simulated migration prerequisites are ready.");
+    }
+
+    $("#parseButton").addEventListener("click", parseEnvironment);
+
+    $("#clearButton").addEventListener("click", () => {
+      $("#envBlock").value = "";
+      $("#parseMessage").classList.remove("is-visible");
+    });
+
+    $("#saveButton").addEventListener("click", () => {
+      showToast("Setup saved", "The current values were saved in this prototype.");
+    });
+
+    $("#azureButton").addEventListener("click", checkAzure);
+    $("#preflightButton").addEventListener("click", runPreflight);
+
+    requiredFields.forEach(id => {
+      $("#" + id).addEventListener("input", () => {
+        updateSummary();
+        resetChecks();
+      });
+    });
+
+    $("#proofLevel").addEventListener("change", () => {
+      updateSummary();
+      resetChecks();
+    });
+
+    $("#skipSmoke").addEventListener("change", resetChecks);
+
+    $("#startButton").addEventListener("click", () => {
+      const random = crypto.getRandomValues(new Uint32Array(1))[0].toString(16).padStart(8, "0");
+      $("#jobId").textContent = `v2-demo-${random}`;
+      $("#modalBackdrop").classList.add("is-visible");
+    });
+
+    $("#closeModalButton").addEventListener("click", () => {
+      $("#modalBackdrop").classList.remove("is-visible");
+    });
+
+    $("#modalBackdrop").addEventListener("click", event => {
+      if (event.target === $("#modalBackdrop")) {
+        $("#modalBackdrop").classList.remove("is-visible");
+      }
+    });
+
+    updateSummary();
+  </script>
+</body>
+</html>

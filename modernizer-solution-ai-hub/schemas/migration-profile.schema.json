@@ -1,0 +1,128 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "migration-profile.schema.json",
+  "title": "Migration Profile",
+  "type": "object",
+  "required": ["id", "source", "target", "rules", "requirements", "openrewrite", "policies"],
+  "properties": {
+    "id": { "type": "string" },
+    "schema": { "type": "string" },
+    "description": { "type": "string" },
+    "source": {
+      "type": "object",
+      "required": ["java", "spring_boot", "build"],
+      "properties": {
+        "java": {
+          "type": "object",
+          "required": ["allowed_versions"],
+          "properties": {
+            "allowed_versions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            }
+          }
+        },
+        "spring_boot": {
+          "type": "object",
+          "required": ["allowed_version_prefixes"],
+          "properties": {
+            "allowed_version_prefixes": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            }
+          }
+        },
+        "build": {
+          "type": "object",
+          "required": ["allowed_tools"],
+          "properties": {
+            "allowed_tools": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["java", "spring_boot", "spring_framework", "build"],
+      "properties": {
+        "java": { "type": "string" },
+        "spring_boot": { "type": "string" },
+        "spring_framework": { "type": "string" },
+        "build": { "type": "string" }
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "required": ["human_approval_required", "baseline_tests_required", "dependency_graph_unavailable_fatal"],
+      "properties": {
+        "human_approval_required": { "type": "boolean" },
+        "baseline_tests_required": { "type": "boolean" },
+        "dependency_graph_unavailable_fatal": { "type": "boolean" }
+      }
+    },
+    "rules": {
+      "type": "object",
+      "required": [
+        "human_approval_required",
+        "baseline_tests_required",
+        "dependency_graph_unavailable_fatal",
+        "openrewrite_preview_allowed",
+        "openrewrite_apply_allowed"
+      ],
+      "properties": {
+        "human_approval_required": { "type": "boolean" },
+        "baseline_tests_required": { "type": "boolean" },
+        "dependency_graph_unavailable_fatal": { "type": "boolean" },
+        "openrewrite_preview_allowed": { "type": "boolean" },
+        "openrewrite_apply_allowed": { "type": "boolean" }
+      }
+    },
+    "openrewrite": {
+      "type": "object",
+      "required": ["preview_allowed", "apply_allowed", "catalog_path"],
+      "properties": {
+        "preview_allowed": { "type": "boolean" },
+        "apply_allowed": { "type": "boolean" },
+        "catalog_path": { "type": "string" },
+        "analysis_preview_maven_args": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "apply_goal": { "type": "string" },
+        "apply_maven_args": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "post_apply_patches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string" },
+              "target_range": { "type": "string" },
+              "property": { "type": "string" },
+              "old_value": { "type": "string" },
+              "new_value": { "type": "string" }
+            },
+            "required": ["type"]
+          }
+        }
+      }
+    },
+    "policies": {
+      "type": "object",
+      "required": ["safety", "planning", "transformation"],
+      "properties": {
+        "safety": { "type": "string" },
+        "planning": { "type": "string" },
+        "transformation": { "type": "string" }
+      }
+    }
+  }
+}
