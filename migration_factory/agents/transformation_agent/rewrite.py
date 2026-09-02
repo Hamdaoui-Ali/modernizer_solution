@@ -67,6 +67,14 @@ def build_rewrite_run_command(
     return " ".join([resolve_maven_executable(), *args])
 
 
+def resolve_rewrite_apply_goal(project_path: Path, apply_goal: str | None) -> str:
+    """Use a lifecycle-forking goal for standalone reactor transforms."""
+    goal = str(apply_goal or "run").strip() or "run"
+    if goal != "runNoFork" or not _is_maven_reactor_root(project_path):
+        return goal
+    return "run"
+
+
 def rewrite_plugin_version_from_xml(plugin_txt_path: str | Path) -> str:
     plugin_element = _parse_plugin_xml(Path(plugin_txt_path).expanduser().resolve())
     group_id, artifact_id = _plugin_coordinates(plugin_element)
@@ -80,6 +88,21 @@ def _resolve_pom(project_path: Path, module: str | None) -> Path:
     if not pom_path.is_file():
         raise RewritePluginError(f"Could not find pom.xml at: {pom_path}")
     return pom_path
+
+
+def _is_maven_reactor_root(project_path: Path) -> bool:
+    pom_path = project_path / "pom.xml"
+    if not pom_path.is_file():
+        return False
+    try:
+        root = ET.parse(pom_path).getroot()
+    except (ET.ParseError, OSError):
+        return False
+
+    modules = _find_child(root, "modules")
+    if modules is None:
+        return False
+    return any(_local_name(child.tag) == "module" and (child.text or "").strip() for child in modules)
 
 
 def _parse_plugin_xml(plugin_txt_path: Path) -> ET.Element:

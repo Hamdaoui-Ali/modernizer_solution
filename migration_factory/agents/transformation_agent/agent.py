@@ -27,7 +27,11 @@ from .pom_patches import (
     patch_spring_boot_version,
     is_stable_spring_boot_35_version,
 )
-from .rewrite import build_rewrite_run_command, rewrite_plugin_version_from_xml
+from .rewrite import (
+    build_rewrite_run_command,
+    resolve_rewrite_apply_goal,
+    rewrite_plugin_version_from_xml,
+)
 
 
 class TransformationAgentError(Exception):
@@ -117,14 +121,20 @@ def _run_unit(
         if transformation_type == "openrewrite":
             active_recipes = [str(item) for item in transformation.get("active_recipes", [])]
             recipe_artifacts = [str(item) for item in transformation.get("recipe_artifacts", [])]
+            configured_apply_goal = str(transformation.get("apply_goal") or "run")
+            apply_goal = resolve_rewrite_apply_goal(plan.target_path, configured_apply_goal)
+            if apply_goal != configured_apply_goal:
+                print(
+                    "OpenRewrite standalone reactor detected; using lifecycle-forking "
+                    f"goal={apply_goal} instead of configured goal={configured_apply_goal}"
+                )
             command = build_rewrite_run_command(
                 active_recipes,
                 recipe_artifacts=recipe_artifacts,
                 plugin_version=plugin_version,
-                apply_goal=str(transformation.get("apply_goal") or "run"),
+                apply_goal=apply_goal,
                 maven_args=[str(item) for item in transformation.get("apply_maven_args", [])],
             )
-            apply_goal = str(transformation.get("apply_goal") or "run")
             apply_maven_args = [str(item) for item in transformation.get("apply_maven_args", [])]
             print(
                 f"OpenRewrite apply unit={unit.id} openrewrite_goal={apply_goal} "

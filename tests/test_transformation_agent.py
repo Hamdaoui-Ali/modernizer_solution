@@ -272,6 +272,57 @@ migration_units:
             self.assertIn("org.openrewrite.maven:rewrite-maven-plugin:6.23.0:runNoFork", command)
             self.assertIn("-Denforcer.skip=true", command)
 
+    def test_openrewrite_apply_uses_lifecycle_forking_goal_for_maven_reactor(self) -> None:
+        with workspace_temp_dir() as tmp:
+            app = tmp / "modernized-app"
+            app.mkdir()
+            (app / "pom.xml").write_text(
+                """
+<project>
+  <packaging>pom</packaging>
+  <modules>
+    <module>shared</module>
+  </modules>
+</project>
+""".strip(),
+                encoding="utf-8",
+            )
+            (app / "shared").mkdir()
+            (app / "shared" / "pom.xml").write_text("<project />", encoding="utf-8")
+            plan = tmp / "plan.yaml"
+            plan.write_text(
+                """
+schema_version: "1.3"
+migration:
+  id: test-migration
+  name: Test Migration
+workspaces:
+  target:
+    path: ./modernized-app
+    migration_dir: .migration
+    ledger_file: .migration/ledger.json
+migration_units:
+  - id: java-17
+    title: Java 17
+    transformations:
+      - type: openrewrite
+        apply_goal: runNoFork
+        active_recipes:
+          - org.openrewrite.java.migrate.UpgradeToJava17
+    checks: []
+""",
+                encoding="utf-8",
+            )
+            plugin = tmp / "rewrite-plugin.txt"
+            plugin.write_text(PLUGIN_XML, encoding="utf-8")
+
+            result = run_transformation_agent(app, plugin, plan, dry_run=True, wait_for_continue=False)
+            ledger = load_ledger(result.ledger_file)
+            command = ledger["units"]["java-17"]["commands"][0]["command"]
+
+            self.assertIn("org.openrewrite.maven:rewrite-maven-plugin:6.23.0:run", command)
+            self.assertNotIn("org.openrewrite.maven:rewrite-maven-plugin:6.23.0:runNoFork", command)
+
     def test_openrewrite_apply_settings_are_loaded_from_profile_and_catalog(self) -> None:
         with workspace_temp_dir() as tmp:
             app = tmp / "modernized-app"
